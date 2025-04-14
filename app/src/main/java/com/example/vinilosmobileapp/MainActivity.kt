@@ -1,47 +1,62 @@
 package com.example.vinilosmobileapp
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.vinilosmobileapp.ui.theme.VinilosMobileAppTheme
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.NavigationUI
+import com.example.vinilosmobileapp.databinding.ActivityMainBinding
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+
+    private val topLevelDestinations = setOf(
+        R.id.homeFragment,
+        R.id.artistFragment,
+        R.id.favoritesFragment,
+        R.id.profileFragment
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            VinilosMobileAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+
+        // Set default night mode to light
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        setSupportActionBar(binding.topAppBar)
+
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        // Bottom navigation setup
+        NavigationUI.setupWithNavController(binding.bottomNavigationView, navController)
+
+        // Change title and show/hide back arrow
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            binding.topAppBar.title = when (destination.id) {
+                R.id.homeFragment -> getString(R.string.title_vinilos)
+                R.id.artistFragment -> getString(R.string.title_artists)
+                R.id.favoritesFragment -> getString(R.string.title_favorites)
+                R.id.profileFragment -> getString(R.string.title_profile)
+                else -> getString(R.string.app_name)
+            }
+
+            // Show back arrow if NOT on a top-level destination
+            val showBackArrow = destination.id !in topLevelDestinations
+            supportActionBar?.setDisplayHomeAsUpEnabled(showBackArrow)
+
+            if (showBackArrow) {
+                binding.topAppBar.setNavigationOnClickListener {
+                    navController.navigateUp()
                 }
+            } else {
+                binding.topAppBar.navigationIcon = null
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    VinilosMobileAppTheme {
-        Greeting("Android")
     }
 }

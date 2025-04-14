@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/homeFragment"
+        android:icon="@drawable/ic_album"
+        android:title="Álbumes" />
+    <item
+        android:id="@+id/artistFragment"
+        android:icon="@drawable/ic_artists"
+        android:title="Artistas" />
+    <item
+        android:id="@+id/favoritesFragment"
+        android:icon="@drawable/ic_favorite"
+        android:title="Favoritos" />
+    <item
+        android:id="@+id/profileFragment"
+        android:icon="@drawable/ic_profile"
+        android:title="Perfil" />
+</menu>
