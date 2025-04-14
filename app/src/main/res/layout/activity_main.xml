@@ -10,9 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/white"
-        app:navigationIcon="?attr/homeAsUpIndicator"
-        app:title="Vinilos"
-        app:titleTextColor="@android:color/white" />
+        app:title="@string/title_vinilos"
+        app:titleCentered="true"
+        app:titleTextColor="@color/black" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
@@ -22,4 +22,13 @@
         android:layout_weight="1"
         app:defaultNavHost="true"
         app:navGraph="@navigation/nav_graph" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:itemIconTint="@color/bottom_nav_color_selector"
+        app:itemTextColor="@color/bottom_nav_color_selector"
+        app:menu="@menu/bottom_nav_menu" />
 </LinearLayout>

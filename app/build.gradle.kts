@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+
 }
 
 android {
@@ -41,7 +42,7 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
-        compose = true
+        // compose = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -63,6 +64,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.core.ktx)
+    implementation(libs.androidx.junit.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -71,9 +74,27 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    //Other implementations
+    // Other implementations
     implementation(libs.navigation.fragment.ktx)
     implementation(libs.navigation.ui.ktx)
     implementation(libs.material)
+    implementation(libs.androidx.material)
+    implementation(libs.glide)
+
+    // Test JUnit
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+
+    debugImplementation("androidx.fragment:fragment-testing:1.6.2")
+
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    debugImplementation("androidx.fragment:fragment-testing:1.6.2")
+
+    testImplementation("junit:junit:4.13.2")
+
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+
+
 
 }
