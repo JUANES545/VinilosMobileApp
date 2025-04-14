@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">VinilosMobileApp</string>
+
+    <!-- Home screen -->
+    <string name="title_vinilos">Vinilos</string>
+    <string name="title_artists">Artistas</string>
+    <string name="title_favorites">Favoritos</string>
+    <string name="title_profile">Perfil</string>
+
+    <!-- Album screen -->
+    <string name="create_new_album">Crear Nuevo Álbum</string>
+    <string name="detail_album">Detalles del Álbum</string>
+
+
+    <!-- Artist screen -->
+
+
+    <!-- Favorites screen -->
+
+
 </resources>
