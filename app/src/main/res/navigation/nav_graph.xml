@@ -8,13 +8,37 @@
         android:id="@+id/homeFragment"
         android:name="com.example.vinilosmobileapp.ui.home.HomeFragment"
         android:label="Home">
-        <action
-            android:id="@+id/action_homeFragment_to_createAlbumFragment"
-            app:destination="@id/createAlbumFragment" />
+    <action
+        android:id="@+id/action_homeFragment_to_createAlbumFragment"
+        app:destination="@id/createAlbumFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/createAlbumFragment"
-        android:name="com.example.vinilosmobileapp.ui.createalbum.CreateAlbumFragment"
-        android:label="Create Album" />
+        android:name="com.example.vinilosmobileapp.ui.album.CreateAlbumFragment"
+        android:label="Crear Álbum" />
+
+    <fragment
+        android:id="@+id/detailAlbumFragment"
+        android:name="com.example.vinilosmobileapp.ui.album.DetailAlbumFragment"
+        android:label="Detalle Álbum">
+        <argument
+            android:name="albumId"
+            app:argType="integer" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/artistFragment"
+        android:name="com.example.vinilosmobileapp.ui.artist.ArtistFragment"
+        android:label="Artistas" />
+
+    <fragment
+        android:id="@+id/favoritesFragment"
+        android:name="com.example.vinilosmobileapp.ui.favorites.FavoritesFragment"
+        android:label="Favoritos" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.vinilosmobileapp.ui.profile.ProfileFragment"
+        android:label="Perfil" />
 </navigation>
