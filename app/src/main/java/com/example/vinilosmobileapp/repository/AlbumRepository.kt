@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.vinilosmobileapp.datasource.remote.AlbumServiceAdapter
 import com.example.vinilosmobileapp.model.Album
 import com.example.vinilosmobileapp.model.AlbumCreateDTO
+import com.example.vinilosmobileapp.model.AlbumDetail
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -46,4 +47,27 @@ class AlbumRepository {
             }
         })
     }
+
+    fun getAlbumDetail(
+        albumId: Int,
+        onSuccess: (AlbumDetail) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        AlbumServiceAdapter.getAlbum(albumId).enqueue(object : Callback<AlbumDetail> {
+            override fun onResponse(call: Call<AlbumDetail>, response: Response<AlbumDetail>) {
+                if (response.isSuccessful) {
+                    response.body()?.let { album ->
+                        onSuccess(album)
+                    } ?: onError("Álbum no encontrado")
+                } else {
+                    onError("Error ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<AlbumDetail>, t: Throwable) {
+                onError(t.message ?: "Error de red")
+            }
+        })
+    }
+
 }
