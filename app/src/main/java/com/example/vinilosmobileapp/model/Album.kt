@@ -2,7 +2,10 @@ package com.example.vinilosmobileapp.model
 
 data class Album(
     val id: Int,
-    val title: String,
-    val artist: String,
-    val imageUrl: String
+    val name: String,
+    val cover: String,
+    val releaseDate: String,
+    val description: String,
+    val genre: String,
+    val recordLabel: String
 )

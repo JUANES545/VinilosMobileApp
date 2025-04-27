@@ -80,6 +80,14 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.material)
     implementation(libs.glide)
+    implementation(libs.shimmer)
+
+
+    // Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.gson)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.retrofit.converter.scalars)
 
     // Test JUnit
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

@@ -16,6 +16,13 @@ material3_version = "1.1.0"
 glide_version = "4.16.0"
 coreKtxVersion = "1.6.1"
 junitKtx = "1.2.1"
+shimmer = "0.5.0"
+
+
+## Retrofit
+retrofit = "2.9.0"
+gson = "2.10.1"
+converter-scalars = "2.9.0"
 
 
 
@@ -43,6 +50,13 @@ androidx-material = { group = "androidx.compose.material3", name = "material3", 
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide_version" }
 core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "coreKtxVersion" }
 androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
+shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
+
+## Retrofit
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+retrofit-converter-scalars = { group = "com.squareup.retrofit2", name = "converter-scalars", version.ref = "converter-scalars" }
 
 
 [plugins]
