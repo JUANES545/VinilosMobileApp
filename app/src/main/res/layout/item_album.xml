@@ -13,11 +13,19 @@
         android:orientation="vertical"
         android:padding="8dp">
 
-        <ImageView
-            android:id="@+id/imageViewAlbumCover"
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmerImageViewAlbumCover"
             android:layout_width="match_parent"
             android:layout_height="160dp"
-            android:scaleType="centerCrop" />
+            app:shimmer_auto_start="true"
+            app:shimmer_duration="1500">
+
+            <ImageView
+                android:id="@+id/imageViewAlbumCover"
+                android:layout_width="match_parent"
+                android:layout_height="160dp"
+                android:scaleType="centerCrop" />
+        </com.facebook.shimmer.ShimmerFrameLayout>
 
         <TextView
             android:id="@+id/textViewAlbumName"

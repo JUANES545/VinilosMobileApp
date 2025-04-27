@@ -3,7 +3,8 @@ package com.example.vinilosmobileapp.ui.home.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
+import coil.load
+import com.example.vinilosmobileapp.R
 import com.example.vinilosmobileapp.databinding.ItemAlbumBinding
 import com.example.vinilosmobileapp.model.Album
 
@@ -17,13 +18,23 @@ class AlbumAdapter(
 
         fun bind(album: Album) {
             binding.textViewAlbumName.text = album.name
-            binding.textViewArtist.text =
-                album.genre    // <-- CAMBIO: usamos `genre` o `recordLabel`
+            binding.textViewArtist.text = album.genre
 
-            Glide.with(binding.root.context)
-                .load(album.cover)
-                .centerCrop()
-                .into(binding.imageViewAlbumCover)
+            binding.imageViewAlbumCover.load(album.cover) {
+                placeholder(R.drawable.ic_image_placeholder)
+                error(R.drawable.ic_failed_to_load_image)
+                listener(
+                    onSuccess = { _, _ ->
+                        // Detener Shimmer al cargar la imagen correctamente
+                        binding.shimmerImageViewAlbumCover.hideShimmer()
+                    },
+                    onError = { _, _ ->
+                        // También detener shimmer si falla
+                        binding.shimmerImageViewAlbumCover.hideShimmer()
+                    }
+                )
+            }
+
         }
     }
 

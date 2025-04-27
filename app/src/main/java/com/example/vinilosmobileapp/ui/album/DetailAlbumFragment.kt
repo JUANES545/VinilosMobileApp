@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.bumptech.glide.Glide
+import coil.load
 import com.example.vinilosmobileapp.R
 import com.example.vinilosmobileapp.databinding.FragmentDetailAlbumBinding
 import com.example.vinilosmobileapp.datasource.local.AlbumDetailProvider
@@ -40,7 +40,11 @@ class DetailAlbumFragment : Fragment() {
             binding.albumYear.text = "${it.year} · ${it.duration} · ${it.genre}"
             binding.albumDescription.text = it.description
 
-            Glide.with(this).load(it.imageUrl).into(binding.albumImage)
+            binding.albumImage.load(it.imageUrl) {
+                placeholder(R.drawable.ic_image_placeholder)
+                error(R.drawable.ic_failed_to_load_image)
+                crossfade(true)
+            }
 
             // Lista de canciones (simplificada)
             binding.trackList.text =
