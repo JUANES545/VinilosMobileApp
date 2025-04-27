@@ -1,7 +1,6 @@
 package com.example.vinilosmobileapp.model
 
-data class Album(
-    val id: Int,
+data class AlbumCreateDTO(
     val name: String,
     val cover: String,
     val releaseDate: String,

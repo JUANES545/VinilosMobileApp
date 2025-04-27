@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Comentario">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputComment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Cambiado para que soporte dropdown -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/inputAuthorLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Selecciona un usuario">
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/inputAuthor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="?attr/colorOnSurface"
+            android:hint="Selecciona un usuario"
+            android:inputType="none" />
+
+        <TextView
+            android:id="@+id/guest_hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Se asignará un Guest automáticamente."
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:visibility="gone" />
+    </com.google.android.material.textfield.TextInputLayout>
+</LinearLayout>

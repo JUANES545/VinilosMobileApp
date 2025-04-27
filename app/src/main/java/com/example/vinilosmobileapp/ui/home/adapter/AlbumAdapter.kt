@@ -3,24 +3,38 @@ package com.example.vinilosmobileapp.ui.home.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
+import coil.load
+import com.example.vinilosmobileapp.R
 import com.example.vinilosmobileapp.databinding.ItemAlbumBinding
 import com.example.vinilosmobileapp.model.Album
 
-class AlbumAdapter(private val albumList: List<Album>, private val onClick: (Int) -> Unit) :
-    RecyclerView.Adapter<AlbumAdapter.AlbumViewHolder>() {
+class AlbumAdapter(
+    private var albumList: List<Album>,
+    private val onClick: (Int) -> Unit
+) : RecyclerView.Adapter<AlbumAdapter.AlbumViewHolder>() {
 
     inner class AlbumViewHolder(private val binding: ItemAlbumBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(album: Album) {
-            binding.textViewAlbumName.text = album.title
-            binding.textViewArtist.text = album.artist
+            binding.textViewAlbumName.text = album.name
+            binding.textViewArtist.text = album.genre
 
-            Glide.with(binding.root.context)
-                .load(album.imageUrl)
-                .centerCrop()
-                .into(binding.imageViewAlbumCover)
+            binding.imageViewAlbumCover.load(album.cover) {
+                placeholder(R.drawable.ic_image_placeholder)
+                error(R.drawable.ic_failed_to_load_image)
+                listener(
+                    onSuccess = { _, _ ->
+                        // Detener Shimmer al cargar la imagen correctamente
+                        binding.shimmerImageViewAlbumCover.hideShimmer()
+                    },
+                    onError = { _, _ ->
+                        // También detener shimmer si falla
+                        binding.shimmerImageViewAlbumCover.hideShimmer()
+                    }
+                )
+            }
+
         }
     }
 
@@ -38,4 +52,9 @@ class AlbumAdapter(private val albumList: List<Album>, private val onClick: (Int
     }
 
     override fun getItemCount(): Int = albumList.size
+
+    fun updateAlbums(newAlbums: List<Album>) {
+        albumList = newAlbums
+        notifyDataSetChanged()
+    }
 }

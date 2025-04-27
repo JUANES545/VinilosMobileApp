@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.core.ktx)
     implementation(libs.androidx.junit.ktx)
+    implementation(libs.androidx.swiperefreshlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -79,7 +80,16 @@ dependencies {
     implementation(libs.navigation.ui.ktx)
     implementation(libs.material)
     implementation(libs.androidx.material)
-    implementation(libs.glide)
+    implementation(libs.coil)
+    implementation(libs.coil.core)
+    implementation(libs.shimmer)
+
+
+    // Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.gson)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.retrofit.converter.scalars)
 
     // Test JUnit
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

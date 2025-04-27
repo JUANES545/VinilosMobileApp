@@ -12,8 +12,20 @@ class AlbumProviderTest {
     }
 
     @Test
-    fun `first album has expected title`() {
+    fun `first album has expected name`() {
         val album = AlbumProvider.getAlbums().first()
-        assertEquals("Dark Side of the Moon", album.title)
+        assertEquals("The Dark Side of the Moon", album.name)
+    }
+
+    @Test
+    fun `first album has expected genre`() {
+        val album = AlbumProvider.getAlbums().first()
+        assertEquals("Rock Progresivo", album.genre)
+    }
+
+    @Test
+    fun `first album has expected record label`() {
+        val album = AlbumProvider.getAlbums().first()
+        assertEquals("Harvest Records", album.recordLabel)
     }
 }
