@@ -20,6 +20,9 @@ import com.example.vinilosmobileapp.model.dto.AlbumCreateDTO
 import com.example.vinilosmobileapp.model.Collector
 import com.example.vinilosmobileapp.model.Comment
 import com.example.vinilosmobileapp.model.Track
+import com.example.vinilosmobileapp.model.dto.CollectorReferenceDTO
+import com.example.vinilosmobileapp.model.dto.CommentCreateDTO
+import com.example.vinilosmobileapp.model.dto.TrackCreateDTO
 import com.example.vinilosmobileapp.ui.album.adapter.CommentInputAdapter
 import com.example.vinilosmobileapp.ui.album.adapter.TrackInputAdapter
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -153,7 +156,7 @@ class CreateAlbumFragment : Fragment() {
         val genre = binding.dropdownGenre.text.toString().trim()
         val artist = binding.dropdownArtist.text.toString().trim()
 
-        // Limpiar errores
+        // Limpiar errores anteriores
         binding.inputAlbumNameLayout.error = null
         binding.inputAlbumYearLayout.error = null
         binding.dropdownGenreLayout.error = null
@@ -175,12 +178,28 @@ class CreateAlbumFragment : Fragment() {
             binding.dropdownArtistLayout.error = "Selecciona un sello discográfico"
             isValid = false
         }
+
         if (!isValid) return
 
         val coverUrl = selectedCoverUrl ?: "https://http.cat/images/102.jpg"
-        val description = binding.inputAlbumDescription.text.toString().trim()
-            .ifEmpty { "Álbum creado desde la app móvil." }
+        val description = binding.inputAlbumDescription.text?.toString()?.trim()
+            ?: "Álbum creado desde la app móvil."
         val releaseDateFormatted = "$year-01-01"
+
+        val commentsList = commentInputAdapter.getComments().map { comment ->
+            CommentCreateDTO(
+                description = comment.description ?: "",
+                rating = comment.rating ?: 5,
+                collector = CollectorReferenceDTO(comment.collector?.id ?: 1)
+            )
+        }
+
+        val tracksList = trackInputAdapter.getTracks().map { track ->
+            TrackCreateDTO(
+                name = track.name,
+                duration = track.duration ?: "3:30 min"
+            )
+        }
 
         val albumCreateDTO = AlbumCreateDTO(
             name = name,
@@ -189,8 +208,8 @@ class CreateAlbumFragment : Fragment() {
             description = description,
             genre = genre,
             recordLabel = artist,
-            tracks = trackInputAdapter.getTracks(),
-            comments = commentInputAdapter.getComments()
+            tracks = if (tracksList.isEmpty()) emptyList() else tracksList,
+            comments = if (commentsList.isEmpty()) emptyList() else commentsList
         )
 
         viewModel.createAlbum(albumCreateDTO)
@@ -248,10 +267,7 @@ class CreateAlbumFragment : Fragment() {
         }
 
         builder.setTitle("Agregar Comentario")
-            .setPositiveButton(
-                "Agregar",
-                null
-            ) // <- lo manejamos manualmente para validar antes de cerrar
+            .setPositiveButton("Agregar", null) // Validación manual después
             .setNegativeButton("Cancelar", null)
 
         val dialog = builder.create()
@@ -272,18 +288,20 @@ class CreateAlbumFragment : Fragment() {
             // Capturar autor
             val selectedAuthor = inputAuthor.text?.toString()?.trim()
 
+            val selectedCollector = currentCollectors.find { it.name == selectedAuthor }
+            val collectorId = selectedCollector?.id ?: 1 // Default ID 1 si no existe
             val authorName = if (!selectedAuthor.isNullOrEmpty()) {
                 selectedAuthor
             } else {
                 "Anónimo"
             }
 
-            // Crear objeto Comment manualmente (usamos un modelo local simplificado)
+            // Crear el comentario
             val comment = Comment(
-                id = 0, // Es local temporal, no necesitamos id aún
+                id = 0,
                 description = commentText,
                 rating = 5,
-                collector = Collector(id = 0, name = authorName)
+                collector = Collector(id = collectorId, name = authorName)
             )
 
             commentInputAdapter.addComment(comment)
@@ -307,13 +325,18 @@ class CreateAlbumFragment : Fragment() {
             "Shape of You"
         )
         val randomSong = randomSongs.random()
-        val randomDuration = "${(2..7).random()}:${(0..59).random().toString().padStart(2, '0')} min"
+        val randomDuration =
+            "${(2..7).random()}:${(0..59).random().toString().padStart(2, '0')} min"
 
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_track, null)
         val inputTrackName =
-            dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.input_track_name)
+            dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(
+                R.id.input_track_name
+            )
         val inputTrackDuration =
-            dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.input_track_duration)
+            dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(
+                R.id.input_track_duration
+            )
 
         // Asignar una canción aleatoria al campo de nombre
         inputTrackName.setText(randomSong)
@@ -324,7 +347,8 @@ class CreateAlbumFragment : Fragment() {
             .setView(dialogView)
             .setPositiveButton("Agregar") { _, _ ->
                 val trackName = inputTrackName.text.toString().trim()
-                val trackDuration = inputTrackDuration.text.toString().trim().ifEmpty { null }
+                val trackDuration =
+                    inputTrackDuration.text.toString().trim().ifEmpty { null }
 
                 if (trackName.isNotEmpty()) {
                     trackInputAdapter.addTrack(
