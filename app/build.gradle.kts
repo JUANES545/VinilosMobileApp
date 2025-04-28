@@ -12,8 +12,8 @@ android {
         applicationId = "com.example.vinilosmobileapp"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.core.ktx)
     implementation(libs.androidx.junit.ktx)
+    implementation(libs.androidx.swiperefreshlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -79,22 +80,27 @@ dependencies {
     implementation(libs.navigation.ui.ktx)
     implementation(libs.material)
     implementation(libs.androidx.material)
-    implementation(libs.glide)
+    implementation(libs.coil)
+    implementation(libs.coil.core)
+    implementation(libs.shimmer)
+
+
+    // Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.gson)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.retrofit.converter.scalars)
 
     // Test JUnit
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-
-    debugImplementation("androidx.fragment:fragment-testing:1.6.2")
-
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-
-    debugImplementation("androidx.fragment:fragment-testing:1.6.2")
-
-    testImplementation("junit:junit:4.13.2")
+    debugImplementation("androidx.fragment:fragment-testing:1.4.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.6.1")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test:runner:1.6.2")
+    androidTestImplementation("org.hamcrest:hamcrest:2.2")
 
     testImplementation("junit:junit:4.13.2")
-    testImplementation("androidx.arch.core:core-testing:2.2.0")
-
+    testImplementation("org.hamcrest:hamcrest-library:2.2")
 
 
 }

@@ -1,17 +1,17 @@
 package com.example.vinilosmobileapp.ui.album
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.vinilosmobileapp.model.dto.AlbumCreateDTO
+import com.example.vinilosmobileapp.repository.AlbumRepository
 
 class CreateAlbumViewModel : ViewModel() {
 
-    private val _albumCreated = MutableLiveData<Boolean>()
-    val albumCreated: LiveData<Boolean> = _albumCreated
+    private val repository = AlbumRepository()
 
-    fun submitAlbum(name: String, year: Int, artist: String, genre: String) {
-        // Here you'd call your use case or repository
-        // Fake success callback
-        _albumCreated.value = true
+    val createAlbumResult: LiveData<Boolean> = repository.createAlbumResult
+
+    fun createAlbum(albumCreateDTO: AlbumCreateDTO) {
+        repository.createAlbum(albumCreateDTO)
     }
 }
