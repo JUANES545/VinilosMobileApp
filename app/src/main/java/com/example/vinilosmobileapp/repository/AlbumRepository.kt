@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.vinilosmobileapp.datasource.remote.AlbumServiceAdapter
 import com.example.vinilosmobileapp.model.Album
-import com.example.vinilosmobileapp.model.AlbumCreateDTO
+import com.example.vinilosmobileapp.model.dto.AlbumCreateDTO
 import com.example.vinilosmobileapp.model.AlbumDetail
 import retrofit2.Call
 import retrofit2.Callback

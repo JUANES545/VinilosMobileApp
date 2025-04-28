@@ -22,13 +22,13 @@
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
-            <!-- Nombre del Álbum -->
+            <!-- Nombre del Album -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/input_album_name_layout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Nombre del Álbum">
+                android:hint="Nombre del Album">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/input_album_name"
@@ -36,7 +36,7 @@
                     android:layout_height="wrap_content" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Año de Lanzamiento -->
+            <!-- Anio de lanzamiento -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/input_album_year_layout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -52,7 +52,7 @@
                     android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Dropdown de Género -->
+            <!-- Genero -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/dropdown_genre_layout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
@@ -70,14 +70,14 @@
                     android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Dropdown de Artista / Sello -->
+            <!-- Artista -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/dropdown_artist_layout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Selecciona un artista"
+                android:hint="Selecciona un sello discográfico"
                 app:endIconMode="dropdown_menu">
 
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -88,7 +88,22 @@
                     android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Título para imagen -->
+            <!-- Descripcion del Album -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/input_album_description_layout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="Descripción (opcional)">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_album_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Imagen del album -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -96,7 +111,6 @@
                 android:text="Imagen del Álbum"
                 android:textStyle="bold" />
 
-            <!-- Contenedor de carga de imagen -->
             <LinearLayout
                 android:id="@+id/image_upload_container"
                 android:layout_width="match_parent"
@@ -128,10 +142,56 @@
                     android:textColor="?attr/colorOnSurface"
                     android:textSize="12sp" />
             </LinearLayout>
+
+            <!-- Seccion de agregar tracks -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Lista de Canciones"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewTracks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_add_track"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Agregar Canción"
+                app:icon="@drawable/ic_add"
+                app:iconGravity="textStart" />
+
+            <!-- Seccion de agregar comentarios -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Comentarios Iniciales"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewComments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_add_comment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Agregar Comentario"
+                app:icon="@drawable/ic_add"
+                app:iconGravity="textStart" />
         </LinearLayout>
     </ScrollView>
 
-    <!-- Botón de Crear Álbum -->
+    <!-- Boton principal crear album -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button_create_album"
         style="@style/Widget.MaterialComponents.Button"
@@ -144,4 +204,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

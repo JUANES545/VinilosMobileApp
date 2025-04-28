@@ -2,7 +2,7 @@ package com.example.vinilosmobileapp.ui.album
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.example.vinilosmobileapp.model.AlbumCreateDTO
+import com.example.vinilosmobileapp.model.dto.AlbumCreateDTO
 import com.example.vinilosmobileapp.repository.AlbumRepository
 
 class CreateAlbumViewModel : ViewModel() {
