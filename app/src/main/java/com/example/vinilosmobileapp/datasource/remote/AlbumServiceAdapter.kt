@@ -3,8 +3,8 @@ package com.example.vinilosmobileapp.datasource.remote
 import com.example.vinilosmobileapp.model.*
 import com.example.vinilosmobileapp.model.dto.AlbumCreateDTO
 import com.example.vinilosmobileapp.model.dto.CollectorCreateDTO
-import com.example.vinilosmobileapp.model.dto.CollectorReferenceDTO
 import com.example.vinilosmobileapp.model.dto.CommentCreateDTO
+import com.example.vinilosmobileapp.model.dto.TrackCreateDTO
 import retrofit2.Call
 
 object AlbumServiceAdapter {
@@ -18,13 +18,12 @@ object AlbumServiceAdapter {
         return service.createAlbum(albumCreateDTO)
     }
 
-    fun addCommentToAlbum(albumId: Int, description: String, collectorId: Int = 1): Call<Void> {
-        val comment = CommentCreateDTO(
-            description = description,
-            rating = 5,
-            collector = CollectorReferenceDTO(collectorId)
-        )
-        return service.addComment(albumId, comment)
+    fun addCommentToAlbum(albumId: Int, commentCreateDTO: CommentCreateDTO): Call<Void> {
+        return service.addComment(albumId, commentCreateDTO)
+    }
+
+    fun addTrackToAlbum(albumId: Int, trackCreateDTO: TrackCreateDTO): Call<Void> {
+        return service.addTrack(albumId, trackCreateDTO)
     }
 
     fun getCollectors(): Call<List<Collector>> {
@@ -32,11 +31,11 @@ object AlbumServiceAdapter {
     }
 
     fun createCollector(name: String, telephone: String, email: String): Call<Collector> {
-        val collectorCreateDTO = CollectorCreateDTO(
+        val collector = CollectorCreateDTO(
             name = name,
             telephone = telephone,
             email = email
         )
-        return service.createCollector(collectorCreateDTO)
+        return service.createCollector(collector)
     }
 }
