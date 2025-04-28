@@ -16,7 +16,7 @@ import com.example.vinilosmobileapp.R
 import com.example.vinilosmobileapp.databinding.FragmentDetailAlbumBinding
 import com.example.vinilosmobileapp.datasource.remote.AlbumServiceAdapter
 import com.example.vinilosmobileapp.model.*
-import com.example.vinilosmobileapp.ui.album.adapter.CommentAdapter
+import com.example.vinilosmobileapp.ui.album.adapter.CommentInputAdapter
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import retrofit2.Call
 import retrofit2.Callback
@@ -30,7 +30,7 @@ class DetailAlbumFragment : Fragment() {
     private val viewModel: DetailAlbumViewModel by viewModels()
 
     private var albumId: Int = -1
-    private lateinit var commentAdapter: CommentAdapter
+    private lateinit var commentAdapter: CommentInputAdapter
 
     private val guestNames = listOf(
         "Melómano Anónimo", "Oyente Misterioso", "Amante del Vinilo",
@@ -68,8 +68,8 @@ class DetailAlbumFragment : Fragment() {
         }
 
         binding.recyclerViewComments.apply {
-            adapter = CommentAdapter(emptyList())
-            commentAdapter = adapter as CommentAdapter
+            adapter = CommentInputAdapter(emptyList())
+            commentAdapter = adapter as CommentInputAdapter
 
             layoutAnimation = android.view.animation.AnimationUtils.loadLayoutAnimation(
                 context,

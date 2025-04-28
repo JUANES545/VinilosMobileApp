@@ -1,4 +1,4 @@
-package com.example.vinilosmobileapp.model
+package com.example.vinilosmobileapp.model.dto
 
 data class CollectorCreateDTO(
     val name: String,

@@ -5,7 +5,9 @@
     android:orientation="vertical"
     android:padding="24dp">
 
+    <!-- Comentario -->
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/inputCommentLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Comentario">
@@ -16,7 +18,7 @@
             android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Cambiado para que soporte dropdown -->
+    <!-- Dropdown para seleccionar usuario -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/inputAuthorLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
@@ -29,18 +31,18 @@
             android:id="@+id/inputAuthor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="?attr/colorOnSurface"
-            android:hint="Selecciona un usuario"
             android:inputType="none" />
-
-        <TextView
-            android:id="@+id/guest_hint"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Se asignará un Guest automáticamente."
-            android:textColor="@color/black"
-            android:textSize="12sp"
-            android:visibility="gone" />
     </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Hint para cuando no haya collectors -->
+    <TextView
+        android:id="@+id/guest_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="8dp"
+        android:text="No hay coleccionistas registrados,\n el comentario será anónimo."
+        android:textColor="@color/black"
+        android:textSize="12sp"
+        android:visibility="visible" />
 </LinearLayout>

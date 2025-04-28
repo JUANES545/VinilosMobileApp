@@ -1,11 +1,11 @@
 package com.example.vinilosmobileapp.datasource.remote
 
 import com.example.vinilosmobileapp.model.Album
-import com.example.vinilosmobileapp.model.AlbumCreateDTO
+import com.example.vinilosmobileapp.model.dto.AlbumCreateDTO
 import com.example.vinilosmobileapp.model.AlbumDetail
 import com.example.vinilosmobileapp.model.Collector
-import com.example.vinilosmobileapp.model.CollectorCreateDTO
-import com.example.vinilosmobileapp.model.CommentCreateDTO
+import com.example.vinilosmobileapp.model.dto.CollectorCreateDTO
+import com.example.vinilosmobileapp.model.dto.CommentCreateDTO
 import retrofit2.Call
 import retrofit2.http.*
 

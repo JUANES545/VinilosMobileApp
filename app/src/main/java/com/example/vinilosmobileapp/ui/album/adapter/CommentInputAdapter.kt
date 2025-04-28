@@ -6,8 +6,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.vinilosmobileapp.databinding.ItemCommentBinding
 import com.example.vinilosmobileapp.model.Comment
 
-class CommentAdapter(private var comments: List<Comment>) :
-    RecyclerView.Adapter<CommentAdapter.CommentViewHolder>() {
+class CommentInputAdapter(private var comments: List<Comment>) :
+    RecyclerView.Adapter<CommentInputAdapter.CommentViewHolder>() {
 
     inner class CommentViewHolder(private val binding: ItemCommentBinding) :
         RecyclerView.ViewHolder(binding.root) {

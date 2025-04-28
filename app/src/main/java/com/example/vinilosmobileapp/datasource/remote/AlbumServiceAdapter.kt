@@ -1,6 +1,10 @@
 package com.example.vinilosmobileapp.datasource.remote
 
 import com.example.vinilosmobileapp.model.*
+import com.example.vinilosmobileapp.model.dto.AlbumCreateDTO
+import com.example.vinilosmobileapp.model.dto.CollectorCreateDTO
+import com.example.vinilosmobileapp.model.dto.CollectorReferenceDTO
+import com.example.vinilosmobileapp.model.dto.CommentCreateDTO
 import retrofit2.Call
 
 object AlbumServiceAdapter {
