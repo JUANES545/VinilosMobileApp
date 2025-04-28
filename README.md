@@ -38,20 +38,15 @@ cd VinilosMobileApp
 
 Android Studio detectará automáticamente el archivo `libs.versions.toml` y descargará las dependencias.
 
-4. **Permitir acceso a internet**
+4. Desplegar el [Backend](https://github.com/MISW-4104-Web/BackVynils) Local/Remoto
 
-Asegúrate de que `AndroidManifest.xml` incluye:
-
-```xml
-<uses-permission android:name="android.permission.INTERNET" />
-```
-
-Ya está incluido por defecto en este proyecto.
+Ya está incluido por defecto en este proyecto, haciendo uso de un servidor propio alojado en nuestro propio [servidor](https://dev2.gestionhq5.com.co/). 
+Pero en caso de fallar, se recomienda ejecutar en local el servidor proveniente del [repositorio](https://github.com/MISW-4104-Web/BackVynils) provisto en clase.
 
 5. **Compilar y ejecutar**
 
 - Selecciona un dispositivo o emulador con Android Lollipop o superior
-- Haz click en el botón **Run** ▶️ o presiona `Shift + F10`
+- Haz click en el botón **Run** ▶️
 
 ---
 
@@ -59,6 +54,7 @@ Ya está incluido por defecto en este proyecto.
 
 Una vez instalada:
 
-- La aplicación mostrará una pantalla inicial con una lista de álbumes simulados (con imágenes y texto)
+- La aplicación mostrará una pantalla inicial con la lista de álbumes  (con imágenes y texto), en caso de existir, de lo contrario se pueden crear siguiendo las idicaciones de la App.
 - Podrás navegar entre secciones con la barra inferior
 - Desde "Álbumes" puedes crear un nuevo álbum o ver detalles
+- En la sección de crear álbum también podrás agregar comentarios y listas de musica, entre otras funcionalidades.
