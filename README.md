@@ -40,7 +40,7 @@ Android Studio detectará automáticamente el archivo `libs.versions.toml` y des
 
 4. Desplegar el [Backend](https://github.com/MISW-4104-Web/BackVynils) Local/Remoto
 
-Ya está incluido por defecto en este proyecto, haciendo uso de un servidor propio alojado en nuestro propio [servidor](https://dev2.gestionhq5.com.co/). 
+Ya está incluido por defecto en la aplicación, consumiendo desde un [servidor](https://dev2.gestionhq5.com.co/) dedicado a este proyecto. 
 Pero en caso de fallar, se recomienda ejecutar en local el servidor proveniente del [repositorio](https://github.com/MISW-4104-Web/BackVynils) provisto en clase.
 
 5. **Compilar y ejecutar**
