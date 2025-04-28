@@ -98,11 +98,12 @@ class HomeFragment : Fragment() {
     private fun showEmptyState() {
         binding.swipeRefresh.isRefreshing = false
         binding.recyclerViewAlbums.visibility = View.GONE
-        binding.textError.text = "No hay álbumes disponibles"
+        binding.textError.text = "No hay álbumes disponibles \n \n" +
+            "Crea una nuevo"
         binding.textError.visibility = View.VISIBLE
         binding.imageError.setImageResource(R.drawable.ic_empty_list)
         binding.imageError.visibility = View.VISIBLE
-        binding.buttonRetry.visibility = View.VISIBLE
+        binding.buttonRetry.visibility = View.GONE
     }
 
     override fun onDestroyView() {

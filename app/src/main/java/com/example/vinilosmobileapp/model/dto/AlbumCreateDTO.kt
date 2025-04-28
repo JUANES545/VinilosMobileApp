@@ -9,9 +9,7 @@ data class AlbumCreateDTO(
     val releaseDate: String,
     val description: String,
     val genre: String,
-    val recordLabel: String,
-    var tracks: List<Track> = emptyList(),
-    var comments: List<Comment> = emptyList()
+    val recordLabel: String
 )
 
 data class TrackCreateDTO(
