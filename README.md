@@ -3,7 +3,7 @@
 Este proyecto tiene como objetivo desarrollar una aplicación móvil para navegar y gestionar catálogos de vinilos basada en la versión web existente.
 
 ## 🍷 APK
-A continuación proporcionamos el siguiente [APK](https://github.com/JUANES545/VinilosMobileApp/releases/download/1.0.0/VinilosMobileApp.apk) para la instalación de la aplicación.
+A continuación proporcionamos el siguiente [APK](https://github.com/JUANES545/VinilosMobileApp/releases/latest/download/VinilosMobileApp.apk) para la instalación de la aplicación.
 
 ## 🛠️ Instrucciones para construir la aplicación localmente
 
@@ -41,7 +41,7 @@ Android Studio detectará automáticamente el archivo `libs.versions.toml` y des
 4. Desplegar el [Backend](https://github.com/MISW-4104-Web/BackVynils) Local/Remoto
 
 Ya está incluido por defecto en la aplicación, consumiendo desde un [servidor](https://dev2.gestionhq5.com.co/) dedicado a este proyecto. 
-Pero en caso de fallar, se recomienda ejecutar en local el servidor proveniente del [repositorio](https://github.com/MISW-4104-Web/BackVynils) provisto en clase.
+Pero en caso de fallar, se recomienda ejecutar en local el servidor proveniente del [repositorio](https://github.com/MISW-4104-Web/BackVynils) provisto en clase y ajustar manualmente el BASE_URL del proyecto dentro del archivo *RetrofitClient.kt*.
 
 5. **Compilar y ejecutar**
 
