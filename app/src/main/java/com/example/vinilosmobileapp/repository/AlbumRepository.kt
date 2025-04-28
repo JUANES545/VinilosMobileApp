@@ -22,13 +22,13 @@ class AlbumRepository {
                     println("✅ GET exitoso: ${response.body()}")
                     albumsLiveData.value = response.body() ?: emptyList()
                 } else {
-                    println("❌ Error en GET, código: ${response.code()}")
+                    println(" Error en GET, código: ${response.code()}")
                     albumsLiveData.value = null
                 }
             }
 
             override fun onFailure(call: Call<List<Album>>, t: Throwable) {
-                println("💥 Fallo de red en GET: ${t.localizedMessage}")
+                println("Fallo de red en GET: ${t.localizedMessage}")
                 albumsLiveData.value = null
             }
         })
