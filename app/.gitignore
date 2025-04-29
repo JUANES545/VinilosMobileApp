@@ -1,1 +1,8 @@
 /build
+/app/build
+
+# Logs
+logs
+
+# macOS system files
+.DS_Store
