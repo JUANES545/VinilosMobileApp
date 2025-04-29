@@ -1,0 +1,480 @@
+Subject: [PATCH] detail-album
+---
+Index: app/src/main/java/com/example/vinilosmobileapp/ui/album/CreateAlbumFragment.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/vinilosmobileapp/ui/album/CreateAlbumFragment.kt b/app/src/main/java/com/example/vinilosmobileapp/ui/album/CreateAlbumFragment.kt
+--- a/app/src/main/java/com/example/vinilosmobileapp/ui/album/CreateAlbumFragment.kt	(revision 9a28ff31d4df7f4cd5bafd006149e002fce06de8)
++++ b/app/src/main/java/com/example/vinilosmobileapp/ui/album/CreateAlbumFragment.kt	(date 1745813223378)
+@@ -1,6 +1,7 @@
+ package com.example.vinilosmobileapp.ui.album
+ 
+ import android.os.Bundle
++import android.util.Log
+ import android.view.LayoutInflater
+ import android.view.View
+ import android.view.ViewGroup
+@@ -16,6 +17,7 @@
+ import com.example.vinilosmobileapp.R
+ import com.example.vinilosmobileapp.databinding.FragmentCreateAlbumBinding
+ import com.example.vinilosmobileapp.datasource.remote.AlbumServiceAdapter
++import com.example.vinilosmobileapp.model.Album
+ import com.example.vinilosmobileapp.model.dto.AlbumCreateDTO
+ import com.example.vinilosmobileapp.model.Collector
+ import com.example.vinilosmobileapp.model.Comment
+@@ -156,7 +158,6 @@
+         val genre = binding.dropdownGenre.text.toString().trim()
+         val artist = binding.dropdownArtist.text.toString().trim()
+ 
+-        // Limpiar errores anteriores
+         binding.inputAlbumNameLayout.error = null
+         binding.inputAlbumYearLayout.error = null
+         binding.dropdownGenreLayout.error = null
+@@ -179,40 +180,137 @@
+             isValid = false
+         }
+ 
+-        if (!isValid) return
++        if (!isValid) {
++            Log.e("CreateAlbum", "❌ Validación fallida: Campos obligatorios vacíos")
++            return
++        }
+ 
+         val coverUrl = selectedCoverUrl ?: "https://http.cat/images/102.jpg"
+         val description = binding.inputAlbumDescription.text?.toString()?.trim()
+             ?: "Álbum creado desde la app móvil."
+         val releaseDateFormatted = "$year-01-01"
+ 
+-        val commentsList = commentInputAdapter.getComments().map { comment ->
+-            CommentCreateDTO(
+-                description = comment.description ?: "",
+-                rating = comment.rating ?: 5,
+-                collector = CollectorReferenceDTO(comment.collector?.id ?: 1)
+-            )
+-        }
+-
+-        val tracksList = trackInputAdapter.getTracks().map { track ->
+-            TrackCreateDTO(
+-                name = track.name,
+-                duration = track.duration ?: "3:30 min"
+-            )
+-        }
+-
+         val albumCreateDTO = AlbumCreateDTO(
+             name = name,
+             cover = coverUrl,
+             releaseDate = releaseDateFormatted,
+-            description = description,
++            description = if (description.isEmpty())
++                "Álbum creado desde la app móvil."
++            else description,
+             genre = genre,
+-            recordLabel = artist,
+-            tracks = if (tracksList.isEmpty()) emptyList() else tracksList,
+-            comments = if (commentsList.isEmpty()) emptyList() else commentsList
++            recordLabel = artist
+         )
++
++        Log.d("CreateAlbum", "🚀 Creando álbum: $albumCreateDTO")
++
++
++        Log.d(
++            "CreateAlbum",
++            "🚀 Enviando solo el álbum (sin comentarios ni tracks todavía): $albumCreateDTO"
++        )
++
++        // 🚀 Primero creamos el álbum
++        AlbumServiceAdapter.createAlbum(albumCreateDTO).enqueue(object : Callback<Album> {
++            override fun onResponse(call: Call<Album>, response: Response<Album>) {
++                if (response.isSuccessful) {
++                    response.body()?.let { album ->
++                        Log.i("CreateAlbum", "✅ Álbum creado con ID: ${album.id}")
++                        // 🚀 2) Ahora sí posteamos sólo lo que realmente agregó el usuario
++                        postCommentsAndTracks(album.id)
++                    }
++                } else {
++                    Toast.makeText(requireContext(), "Error creando álbum", Toast.LENGTH_SHORT)
++                        .show()
++                }
++            }
++
++            override fun onFailure(call: Call<Album>, t: Throwable) {
++                Toast.makeText(requireContext(), "Error de red creando álbum", Toast.LENGTH_SHORT)
++                    .show()
++            }
++        })
++    }
++
++    private fun postCommentsAndTracks(albumId: Int) {
++        val comments = commentInputAdapter.getComments()
++        val tracks = trackInputAdapter.getTracks()
++
++        var pendingRequests = 0
++        var hasErrors = false
++
++        if (comments.isNotEmpty()) {
++            pendingRequests += comments.size
++            comments.forEach { comment ->
++                val commentDTO = CommentCreateDTO(
++                    description = comment.description,
++                    rating = comment.rating,
++                    collector = CollectorReferenceDTO(comment.collector?.id ?: 1)
++                )
++                AlbumServiceAdapter.addCommentToAlbum(albumId, commentDTO)
++                    .enqueue(object : Callback<Void> {
++                        override fun onResponse(call: Call<Void>, response: Response<Void>) {
++                            pendingRequests--
++                            if (!response.isSuccessful) hasErrors = true
++                            checkPendingRequests(pendingRequests, hasErrors)
++                        }
+ 
+-        viewModel.createAlbum(albumCreateDTO)
++                        override fun onFailure(call: Call<Void>, t: Throwable) {
++                            pendingRequests--
++                            hasErrors = true
++                            checkPendingRequests(pendingRequests, hasErrors)
++                        }
++                    })
++            }
++        }
++
++        if (tracks.isNotEmpty()) {
++            pendingRequests += tracks.size
++            tracks.forEach { track ->
++                val trackDTO = TrackCreateDTO(
++                    name = track.name,
++                    duration = track.duration ?: "3:30 min"
++                )
++                AlbumServiceAdapter.addTrackToAlbum(albumId, trackDTO)
++                    .enqueue(object : Callback<Void> {
++                        override fun onResponse(call: Call<Void>, response: Response<Void>) {
++                            pendingRequests--
++                            if (!response.isSuccessful) hasErrors = true
++                            checkPendingRequests(pendingRequests, hasErrors)
++                        }
++
++                        override fun onFailure(call: Call<Void>, t: Throwable) {
++                            pendingRequests--
++                            hasErrors = true
++                            checkPendingRequests(pendingRequests, hasErrors)
++                        }
++                    })
++            }
++        }
++        if (comments.isEmpty() && tracks.isEmpty()) {
++            Toast.makeText(requireContext(), "Álbum creado exitosamente", Toast.LENGTH_SHORT).show()
++            parentFragmentManager.setFragmentResult("album_created", Bundle())
++            requireActivity().onBackPressedDispatcher.onBackPressed()
++        }
++    }
++
++    private fun checkPendingRequests(pending: Int, hasErrors: Boolean) {
++        if (pending == 0) {
++            if (hasErrors) {
++                Toast.makeText(
++                    requireContext(),
++                    "Error parcial al crear comentarios o canciones",
++                    Toast.LENGTH_SHORT
++                ).show()
++            } else {
++                Toast.makeText(
++                    requireContext(),
++                    "Álbum y contenido creado exitosamente",
++                    Toast.LENGTH_SHORT
++                ).show()
++                parentFragmentManager.setFragmentResult("album_created", Bundle())
++                requireActivity().onBackPressedDispatcher.onBackPressed()
++            }
++        }
+     }
+ 
+     private fun fetchCollectors() {
+@@ -259,7 +357,11 @@
+         val collectorsNames = currentCollectors.map { it.name }
+         if (collectorsNames.isNotEmpty()) {
+             val adapter =
+-                ArrayAdapter(context, android.R.layout.simple_dropdown_item_1line, collectorsNames)
++                ArrayAdapter(
++                    context,
++                    android.R.layout.simple_dropdown_item_1line,
++                    collectorsNames
++                )
+             inputAuthor.setAdapter(adapter)
+             guestHint.visibility = View.GONE
+         } else {
+@@ -274,41 +376,41 @@
+         dialog.show()
+ 
+         // 👀 Validación manual en positivo
+-        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+-            val commentText = inputComment.text?.toString()?.trim() ?: ""
++        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
++            .setOnClickListener {
++                val commentText = inputComment.text?.toString()?.trim() ?: ""
+ 
+-            // Validar comentario obligatorio
+-            if (commentText.isEmpty()) {
+-                inputCommentLayout.error = "El comentario es obligatorio"
+-                return@setOnClickListener
+-            } else {
+-                inputCommentLayout.error = null
+-            }
++                // Validar comentario obligatorio
++                if (commentText.isEmpty()) {
++                    inputCommentLayout.error = "El comentario es obligatorio"
++                    return@setOnClickListener
++                } else {
++                    inputCommentLayout.error = null
++                }
+ 
+-            // Capturar autor
+-            val selectedAuthor = inputAuthor.text?.toString()?.trim()
++                // Capturar autor
++                val selectedAuthor = inputAuthor.text?.toString()?.trim()
+ 
+-            val selectedCollector = currentCollectors.find { it.name == selectedAuthor }
+-            val collectorId = selectedCollector?.id ?: 1 // Default ID 1 si no existe
+-            val authorName = if (!selectedAuthor.isNullOrEmpty()) {
+-                selectedAuthor
+-            } else {
+-                "Anónimo"
+-            }
++                val selectedCollector = currentCollectors.find { it.name == selectedAuthor }
++                val collectorId = selectedCollector?.id ?: 1 // Default ID 1 si no existe
++                val authorName = if (!selectedAuthor.isNullOrEmpty()) {
++                    selectedAuthor
++                } else {
++                    "Anónimo"
++                }
+ 
+-            // Crear el comentario
+-            val comment = Comment(
+-                id = 0,
+-                description = commentText,
+-                rating = 5,
+-                collector = Collector(id = collectorId, name = authorName)
+-            )
++                // Crear el comentario
++                val comment = Comment(
++                    id = 0,
++                    description = commentText,
++                    rating = 5,
++                    collector = Collector(id = collectorId, name = authorName)
++                )
+ 
+-            commentInputAdapter.addComment(comment)
++                commentInputAdapter.addComment(comment)
+ 
+-            Toast.makeText(context, "Comentario agregado", Toast.LENGTH_SHORT).show()
+-            dialog.dismiss()
+-        }
++                dialog.dismiss()
++            }
+     }
+ 
+     private fun showAddTrackDialog() {
+Index: app/src/main/java/com/example/vinilosmobileapp/ui/album/DetailAlbumFragment.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/vinilosmobileapp/ui/album/DetailAlbumFragment.kt b/app/src/main/java/com/example/vinilosmobileapp/ui/album/DetailAlbumFragment.kt
+--- a/app/src/main/java/com/example/vinilosmobileapp/ui/album/DetailAlbumFragment.kt	(revision 9a28ff31d4df7f4cd5bafd006149e002fce06de8)
++++ b/app/src/main/java/com/example/vinilosmobileapp/ui/album/DetailAlbumFragment.kt	(date 1745811059139)
+@@ -16,6 +16,8 @@
+ import com.example.vinilosmobileapp.databinding.FragmentDetailAlbumBinding
+ import com.example.vinilosmobileapp.datasource.remote.AlbumServiceAdapter
+ import com.example.vinilosmobileapp.model.*
++import com.example.vinilosmobileapp.model.dto.CollectorReferenceDTO
++import com.example.vinilosmobileapp.model.dto.CommentCreateDTO
+ import com.example.vinilosmobileapp.ui.album.adapter.CommentInputAdapter
+ import com.google.android.material.textfield.MaterialAutoCompleteTextView
+ import retrofit2.Call
+@@ -37,8 +39,7 @@
+         "Coleccionista X", "Música para el alma"
+     )
+ 
+-    private var collectorsAvailable: List<Collector>? = null
+-    private lateinit var selectedCollector: Collector
++    private var collectorsAvailable: List<Collector> = emptyList()
+ 
+     override fun onCreateView(
+         inflater: LayoutInflater,
+@@ -63,23 +64,18 @@
+             showError("ID de álbum no válido")
+         }
+ 
+-        binding.buttonRetry.setOnClickListener {
+-            fetchAlbum()
+-        }
++        binding.buttonRetry.setOnClickListener { fetchAlbum() }
+ 
+         binding.recyclerViewComments.apply {
+             adapter = CommentInputAdapter(emptyList())
+             commentAdapter = adapter as CommentInputAdapter
+-
+             layoutAnimation = android.view.animation.AnimationUtils.loadLayoutAnimation(
+                 context,
+                 R.anim.layout_fade_in
+             )
+         }
+ 
+-        binding.buttonAddComment.setOnClickListener {
+-            showAddCommentDialog()
+-        }
++        binding.buttonAddComment.setOnClickListener { showAddCommentDialog() }
+ 
+         setupObservers()
+     }
+@@ -118,7 +114,6 @@
+         }
+ 
+         val comments = album.comments.ifEmpty { emptyList() }
+-
+         if (comments.isEmpty()) {
+             binding.recyclerViewComments.visibility = View.GONE
+             binding.noCommentsText.visibility = View.VISIBLE
+@@ -138,22 +133,19 @@
+         }
+     }
+ 
+-
+     private fun showAddCommentDialog() {
+         val context = requireContext()
+         val builder = androidx.appcompat.app.AlertDialog.Builder(context)
+-
+         val dialogView = layoutInflater.inflate(R.layout.dialog_add_comment, null)
+         builder.setView(dialogView)
+ 
+         val commentInput =
+             dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.inputComment)
+         val authorDropdown = dialogView.findViewById<MaterialAutoCompleteTextView>(R.id.inputAuthor)
++        val guestHint = dialogView.findViewById<TextView>(R.id.guest_hint)
+ 
+         val guestName = "Guest: ${guestNames.random()}"
+ 
+-        val guestHint = dialogView.findViewById<TextView>(R.id.guest_hint)
+-
+         AlbumServiceAdapter.getCollectors().enqueue(object : Callback<List<Collector>> {
+             override fun onResponse(
+                 call: Call<List<Collector>>,
+@@ -162,16 +154,16 @@
+                 if (response.isSuccessful) {
+                     collectorsAvailable = response.body() ?: emptyList()
+ 
+-                    if (collectorsAvailable!!.isNotEmpty()) {
++                    if (collectorsAvailable.isNotEmpty()) {
+                         guestHint.visibility = View.GONE
+-                        val names = collectorsAvailable!!.map { it.name }
++                        val names = collectorsAvailable.map { it.name }
+                         val adapter = ArrayAdapter(
+                             requireContext(),
+                             android.R.layout.simple_dropdown_item_1line,
+                             names
+                         )
+                         authorDropdown.setAdapter(adapter)
+-                        authorDropdown.setText(names.random(), false)
++                        authorDropdown.setText(names.firstOrNull(), false)
+                     } else {
+                         guestHint.visibility = View.VISIBLE
+                         authorDropdown.setText(guestName, false)
+@@ -188,22 +180,23 @@
+             }
+         })
+ 
+-
+         builder.setTitle("Nuevo comentario")
+             .setPositiveButton("Agregar") { _, _ ->
+                 val commentText = commentInput.text.toString().trim()
+                 val selectedAuthorName = authorDropdown.text.toString().trim()
+ 
+                 if (commentText.isNotEmpty()) {
+-                    val collectorId =
+-                        collectorsAvailable?.firstOrNull { it.name == selectedAuthorName }?.id
+-                    if (collectorId != null) {
+-                        addComment(commentText, collectorId)
++                    val collector = collectorsAvailable.find { it.name == selectedAuthorName }
++
++                    if (collector != null) {
++                        addComment(commentText, collector.id)
+                     } else {
+-                        createGuestCollector(selectedAuthorName) { newCollectorId ->
+-                            addComment(commentText, newCollectorId)
++                        createGuestCollector(selectedAuthorName) { guestId ->
++                            addComment(commentText, guestId)
+                         }
+                     }
++                } else {
++                    Toast.makeText(context, "Comentario obligatorio", Toast.LENGTH_SHORT).show()
+                 }
+             }
+             .setNegativeButton("Cancelar", null)
+@@ -212,28 +205,23 @@
+     }
+ 
+     private fun addComment(description: String, collectorId: Int) {
+-        AlbumServiceAdapter.addCommentToAlbum(albumId, description, collectorId)
++        val commentCreateDTO = CommentCreateDTO(
++            description = description,
++            rating = 5,
++            collector = CollectorReferenceDTO(id = collectorId)
++        )
++
++        AlbumServiceAdapter.addCommentToAlbum(albumId, commentCreateDTO)
++
+             .enqueue(object : Callback<Void> {
+                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                     if (response.isSuccessful) {
++                        fetchAlbum() // 👈 Refrescamos comentarios reales desde servidor
+                         Toast.makeText(
+                             requireContext(),
+                             "Comentario agregado correctamente",
+                             Toast.LENGTH_SHORT
+                         ).show()
+-
+-                        // Simula añadir el comentario a la lista local
+-                        val simulatedComment = Comment(
+-                            id = (0..10000).random(), // id temporal aleatorio
+-                            description = description,
+-                            collector = Collector(1 , name = "Tú"), // Puedes usar el nombre si quieres
+-                            rating = 5
+-                        )
+-                        commentAdapter.addComment(simulatedComment)
+-
+-                        binding.recyclerViewComments.visibility = View.VISIBLE
+-                        binding.noCommentsText.visibility = View.GONE
+-                        binding.recyclerViewComments.scheduleLayoutAnimation()
+                     } else {
+                         Toast.makeText(
+                             requireContext(),
+@@ -243,7 +231,6 @@
+                     }
+                 }
+ 
+-
+                 override fun onFailure(call: Call<Void>, t: Throwable) {
+                     Toast.makeText(
+                         requireContext(),
+@@ -264,8 +251,10 @@
+                 if (response.isSuccessful) {
+                     response.body()?.let { onCollectorCreated(it.id) }
+                 } else {
+-                    val errorBody = response.errorBody()?.string()
+-                    Log.e("GUEST_CREATION", "Error: ${response.code()} - $errorBody")
++                    Log.e(
++                        "GUEST_CREATION",
++                        "Error: ${response.code()} - ${response.errorBody()?.string()}"
++                    )
+                     Toast.makeText(requireContext(), "Error creando guest", Toast.LENGTH_SHORT)
+                         .show()
+                 }
+@@ -278,7 +267,6 @@
+         })
+     }
+ 
+-
+     private fun showError(message: String) {
+         binding.contentLayout.visibility = View.GONE
+         binding.errorLayout.visibility = View.VISIBLE
