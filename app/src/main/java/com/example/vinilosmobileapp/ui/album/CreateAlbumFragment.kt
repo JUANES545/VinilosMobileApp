@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import com.example.vinilosmobileapp.R
 import com.example.vinilosmobileapp.databinding.FragmentCreateAlbumBinding
@@ -241,46 +240,145 @@ class CreateAlbumFragment : Fragment() {
     }
 
     private fun sendCommentsAndTracks(albumId: Int) {
-        var pendingRequests = 0
+        val comments = commentInputAdapter.getComments()
+        val tracks = trackInputAdapter.getTracks()
+        var totalPending = comments.size + tracks.size
         var hasErrors = false
 
-        // Enviar comentarios
-        for (comment in commentInputAdapter.getComments()) {
-            pendingRequests++
-            val commentDTO = CommentCreateDTO(
-                description = comment.description,
-                rating = comment.rating,
-                collector = CollectorReferenceDTO(comment.collector?.id ?: 1) // Default ID
-            )
-            AlbumServiceAdapter.addCommentToAlbum(albumId, commentDTO)
-                .enqueue(object : Callback<Void> {
-                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                        pendingRequests--
-                        if (!response.isSuccessful) {
-                            hasErrors = true
-                            Log.e(
-                                "CreateAlbum",
-                                "❌ Error al crear comentario: ${response.code()} - ${
-                                    response.errorBody()?.string()
-                                }"
-                            )
+        // Si no hay nada que enviar, volvemos ya
+        if (totalPending == 0) {
+            checkPendingRequests(0, false)
+            return
+        }
+
+        // Helpers para decrementar y comprobar
+        fun onCompleteSingle(error: Boolean) {
+            totalPending--
+            if (error) hasErrors = true
+            checkPendingRequests(totalPending, hasErrors)
+        }
+
+        // 1) comments
+        comments.forEach { comment ->
+            // Si no hay collectors, crea uno antes de enviar
+            val sendWithCollector: (Int) -> Unit = { collectorId ->
+                val dto = CommentCreateDTO(
+                    description = comment.description,
+                    rating = comment.rating,
+                    collector = CollectorReferenceDTO(collectorId)
+                )
+                AlbumServiceAdapter.addCommentToAlbum(albumId, dto)
+                    .enqueue(object : Callback<Void> {
+                        override fun onResponse(call: Call<Void>, resp: Response<Void>) {
+                            onCompleteSingle(!resp.isSuccessful)
                         }
-                        checkPendingRequests(pendingRequests, hasErrors)
+
+                        override fun onFailure(call: Call<Void>, t: Throwable) {
+                            onCompleteSingle(true)
+                        }
+                    })
+            }
+
+            if (currentCollectors.isEmpty()) {
+                createGuestCollector { sendWithCollector(it) }
+            } else {
+                sendWithCollector(comment.collector?.id ?: currentCollectors.first().id)
+            }
+        }
+
+        // 2) tracks
+        tracks.forEach { track ->
+            val dto = TrackCreateDTO(track.name, track.duration ?: "3:30 min")
+            AlbumServiceAdapter.addTrackToAlbum(albumId, dto)
+                .enqueue(object : Callback<Void> {
+                    override fun onResponse(call: Call<Void>, resp: Response<Void>) {
+                        onCompleteSingle(!resp.isSuccessful)
                     }
 
                     override fun onFailure(call: Call<Void>, t: Throwable) {
-                        pendingRequests--
-                        hasErrors = true
-                        Log.e(
-                            "CreateAlbum",
-                            "❌ Error de red al crear comentario: ${t.localizedMessage}"
-                        )
-                        checkPendingRequests(pendingRequests, hasErrors)
+                        onCompleteSingle(true)
                     }
                 })
         }
+    }
 
-        // Enviar tracks
+    private fun sendComments(albumId: Int, onError: () -> Unit): Int {
+        val comments = commentInputAdapter.getComments()
+        if (comments.isEmpty()) return 0
+
+        var pendingRequests = comments.size
+
+        // Si no hay collectors, creamos uno Guest antes de enviar los comentarios
+        if (currentCollectors.isEmpty()) {
+            Log.w("CreateAlbum", "⚠️ No hay collectors disponibles, creando Guest...")
+            createGuestCollector { guestId ->
+                Log.i("CreateAlbum", "✅ Guest disponible con ID: $guestId, enviando comentarios...")
+                comments.forEach { comment ->
+                    sendSingleComment(albumId, comment, guestId, onError) { hasError ->
+                        pendingRequests--
+                        checkPendingRequests(pendingRequests, hasError)
+                    }
+                }
+            }
+        } else {
+            // Ya hay collectors: usamos el ID del comment o el primero disponible
+            val defaultCollectorId = currentCollectors.first().id
+            comments.forEach { comment ->
+                val collectorId = comment.collector?.id ?: defaultCollectorId
+                sendSingleComment(albumId, comment, collectorId, onError) { hasError ->
+                    pendingRequests--
+                    checkPendingRequests(pendingRequests, hasError)
+                }
+            }
+        }
+
+        return comments.size
+    }
+
+    private fun sendSingleComment(
+        albumId: Int,
+        comment: Comment,
+        collectorId: Int,
+        onError: () -> Unit,
+        onComplete: (hasError: Boolean) -> Unit
+    ) {
+        val commentDTO = CommentCreateDTO(
+            description = comment.description,
+            rating = comment.rating,
+            collector = CollectorReferenceDTO(collectorId)
+        )
+
+        AlbumServiceAdapter.addCommentToAlbum(albumId, commentDTO)
+            .enqueue(object : Callback<Void> {
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                    if (!response.isSuccessful) {
+                        onError()
+                        Log.e(
+                            "CreateAlbum",
+                            "❌ Error al crear comentario: ${response.code()} - ${
+                                response.errorBody()?.string()
+                            }"
+                        )
+                        onComplete(true)
+                    } else {
+                        onComplete(false)
+                    }
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    onError()
+                    Log.e(
+                        "CreateAlbum",
+                        "❌ Error de red al crear comentario: ${t.localizedMessage}"
+                    )
+                    onComplete(true)
+                }
+            })
+    }
+
+    private fun sendTracks(albumId: Int, onError: () -> Unit): Int {
+        var pendingRequests = 0
+
         for (track in trackInputAdapter.getTracks()) {
             pendingRequests++
             val trackDTO =
@@ -289,7 +387,7 @@ class CreateAlbumFragment : Fragment() {
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     pendingRequests--
                     if (!response.isSuccessful) {
-                        hasErrors = true
+                        onError()
                         Log.e(
                             "CreateAlbum",
                             "❌ Error al crear track: ${response.code()} - ${
@@ -297,30 +395,28 @@ class CreateAlbumFragment : Fragment() {
                             }"
                         )
                     }
-                    checkPendingRequests(pendingRequests, hasErrors)
+                    checkPendingRequests(pendingRequests, hasErrors = false)
                 }
 
                 override fun onFailure(call: Call<Void>, t: Throwable) {
                     pendingRequests--
-                    hasErrors = true
+                    onError()
                     Log.e("CreateAlbum", "❌ Error de red al crear track: ${t.localizedMessage}")
-                    checkPendingRequests(pendingRequests, hasErrors)
+                    checkPendingRequests(pendingRequests, hasErrors = true)
                 }
             })
         }
 
-        // Si no hay comentarios ni tracks, verificar inmediatamente
-        if (pendingRequests == 0) {
-            checkPendingRequests(pendingRequests, hasErrors)
-        }
+        return pendingRequests
     }
 
     private fun checkPendingRequests(pending: Int, hasErrors: Boolean) {
+        if (!isAdded) return
         if (pending == 0) {
             if (hasErrors) {
                 Toast.makeText(
                     requireContext(),
-                    "Álbum creado, pero hubo errores al agregar comentarios o canciones",
+                    "Álbum creado, pero hubo errores al agregar contenido",
                     Toast.LENGTH_LONG
                 ).show()
             } else {
@@ -330,36 +426,39 @@ class CreateAlbumFragment : Fragment() {
                     Toast.LENGTH_LONG
                 ).show()
             }
-            // Notificar al HomeFragment y regresar
             parentFragmentManager.setFragmentResult("album_created", Bundle())
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
     }
 
-
     private fun createGuestCollector(onGuestCreated: (Int) -> Unit) {
-        val guestName = "Anónimo ${System.currentTimeMillis()}"
+        val guestName = "Anonimo${System.currentTimeMillis()}"
+        val email = "${guestName}@guest.com"
         AlbumServiceAdapter.createCollector(
             name = guestName,
-            telephone = "000-0000000",
-            email = "$guestName@example.com"
+            telephone = "0000000000",
+            email = email
         ).enqueue(object : Callback<Collector> {
             override fun onResponse(call: Call<Collector>, response: Response<Collector>) {
                 if (response.isSuccessful) {
-                    val guestCollector = response.body()
-                    if (guestCollector != null) {
-                        Log.i("CreateAlbum", "✅ Guest creado con ID: ${guestCollector.id}")
-                        onGuestCreated(guestCollector.id)
+                    val guest = response.body()
+                    if (guest != null) {
+                        Log.i("CreateAlbum", "✅ Guest creado con ID: ${guest.id}")
+                        onGuestCreated(guest.id)
                     } else {
-                        Log.e("CreateAlbum", "❌ Error creando guest: respuesta vacía")
+                        Log.e("CreateAlbum", "❌ Error creando guest: cuerpo vacío")
+                        onGuestCreated(currentCollectors.firstOrNull()?.id ?: 1)
                     }
                 } else {
-                    Log.e("CreateAlbum", "❌ Error creando guest: ${response.code()}")
+                    val err = response.errorBody()?.string()
+                    Log.e("CreateAlbum", "❌ Error creando guest: ${response.code()} - $err")
+                    onGuestCreated(currentCollectors.firstOrNull()?.id ?: 1)
                 }
             }
 
             override fun onFailure(call: Call<Collector>, t: Throwable) {
                 Log.e("CreateAlbum", "❌ Error de red creando guest: ${t.localizedMessage}")
+                onGuestCreated(currentCollectors.firstOrNull()?.id ?: 1)
             }
         })
     }
@@ -396,7 +495,7 @@ class CreateAlbumFragment : Fragment() {
         val inputComment =
             dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.inputComment)
 
-        val inputAuthor =
+        val inputCollector =
             dialogView.findViewById<com.google.android.material.textfield.MaterialAutoCompleteTextView>(
                 R.id.inputAuthor
             )
@@ -413,7 +512,7 @@ class CreateAlbumFragment : Fragment() {
                     android.R.layout.simple_dropdown_item_1line,
                     collectorsNames
                 )
-            inputAuthor.setAdapter(adapter)
+            inputCollector.setAdapter(adapter)
             guestHint.visibility = View.GONE
         } else {
             guestHint.visibility = View.VISIBLE
@@ -426,12 +525,10 @@ class CreateAlbumFragment : Fragment() {
         val dialog = builder.create()
         dialog.show()
 
-        // 👀 Validación manual en positivo
         dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
             .setOnClickListener {
                 val commentText = inputComment.text?.toString()?.trim() ?: ""
 
-                // Validar comentario obligatorio
                 if (commentText.isEmpty()) {
                     inputCommentLayout.error = "El comentario es obligatorio"
                     return@setOnClickListener
@@ -439,8 +536,7 @@ class CreateAlbumFragment : Fragment() {
                     inputCommentLayout.error = null
                 }
 
-                // Capturar autor
-                val selectedAuthor = inputAuthor.text?.toString()?.trim()
+                val selectedAuthor = inputCollector.text?.toString()?.trim()
 
                 val selectedCollector = currentCollectors.find { it.name == selectedAuthor }
                 val collectorId = selectedCollector?.id ?: 1 // Default ID 1 si no existe
@@ -475,7 +571,6 @@ class CreateAlbumFragment : Fragment() {
                 R.id.input_track_duration
             )
 
-        // Asignar una canción aleatoria al campo de nombre
         inputTrackName.setText(randomSongs.random())
         inputTrackDuration.setText(randomDuration())
 

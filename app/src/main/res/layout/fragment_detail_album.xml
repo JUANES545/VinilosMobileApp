@@ -83,8 +83,7 @@
                 android:layout_marginTop="8dp"
                 android:foregroundGravity="center"
                 android:nestedScrollingEnabled="false"
-                android:overScrollMode="never"
-                tools:listitem="@layout/item_track" />
+                android:overScrollMode="never" />
 
             <!-- Sección de comentarios -->
             <TextView
@@ -110,8 +109,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:nestedScrollingEnabled="false"
-                android:overScrollMode="never"
-                tools:listitem="@layout/item_comment" />
+                android:overScrollMode="never" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonAddComment"
@@ -122,7 +120,7 @@
                 android:text="Agregar comentario"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
-                android:visibility="visible" />
+                android:visibility="gone" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
