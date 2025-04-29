@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Contenido normal del álbum -->
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/contentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -76,12 +76,14 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/trackList"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewTracks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textSize="14sp" />
+                android:layout_marginTop="8dp"
+                android:foregroundGravity="center"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never" />
 
             <!-- Sección de comentarios -->
             <TextView
@@ -118,10 +120,10 @@
                 android:text="Agregar comentario"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
-                android:visibility="visible" />
+                android:visibility="gone" />
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <!-- Layout de error de red -->
     <LinearLayout

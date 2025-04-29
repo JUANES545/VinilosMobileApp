@@ -3,14 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white_background">
+    android:layout_height="match_parent">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollViewContent"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:padding="16dp"
+        android:background="@color/white_background"
+        android:paddingTop="16dp"
         app:layout_constraintBottom_toTopOf="@id/button_create_album"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,7 +20,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp">
 
             <!-- Nombre del Album -->
             <com.google.android.material.textfield.TextInputLayout
@@ -140,7 +141,8 @@
                     android:layout_height="wrap_content"
                     android:text="PNG, JPG hasta 5MB"
                     android:textColor="?attr/colorOnSurface"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <!-- Seccion de agregar tracks -->
@@ -155,7 +157,9 @@
                 android:id="@+id/recyclerViewTracks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"
+                android:overScrollMode="never"
+                tools:listitem="@layout/item_track" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_add_track"
@@ -163,6 +167,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Agregar Canción"
+                android:textAllCaps="false"
                 app:icon="@drawable/ic_add"
                 app:iconGravity="textStart" />
 
@@ -178,18 +183,22 @@
                 android:id="@+id/recyclerViewComments"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/item_comment" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_add_comment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:layout_marginBottom="26dp"
                 android:text="Agregar Comentario"
+                android:textAllCaps="false"
                 app:icon="@drawable/ic_add"
                 app:iconGravity="textStart" />
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <!-- Boton principal crear album -->
     <com.google.android.material.button.MaterialButton
@@ -197,8 +206,9 @@
         style="@style/Widget.MaterialComponents.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginHorizontal="26dp"
         android:backgroundTint="?attr/colorPrimary"
+        android:padding="16dp"
         android:text="Crear Álbum"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
