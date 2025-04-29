@@ -10,6 +10,6 @@ data class AlbumCreateDTO(
 )
 
 data class TrackCreateDTO(
-    val name:     String,
-    val duration: String
+    val name:        String,
+    val duration:    String
 )
