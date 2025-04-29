@@ -39,6 +39,4 @@ class CommentInputAdapter(private var comments: List<Comment>) :
         comments = comments + comment
         notifyItemInserted(comments.size - 1)
     }
-
-
 }

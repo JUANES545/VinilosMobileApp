@@ -28,6 +28,10 @@ import com.example.vinilosmobileapp.model.dto.CommentCreateDTO
 import com.example.vinilosmobileapp.model.dto.TrackCreateDTO
 import com.example.vinilosmobileapp.ui.album.adapter.CommentInputAdapter
 import com.example.vinilosmobileapp.ui.album.adapter.TrackInputAdapter
+import com.example.vinilosmobileapp.utils.RandomDataProvider
+import com.example.vinilosmobileapp.utils.RandomDataProvider.randomComments
+import com.example.vinilosmobileapp.utils.RandomDataProvider.randomDuration
+import com.example.vinilosmobileapp.utils.RandomDataProvider.randomSongs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import retrofit2.Call
 import retrofit2.Callback
@@ -46,10 +50,8 @@ class CreateAlbumFragment : Fragment() {
     private lateinit var commentInputAdapter: CommentInputAdapter
     private lateinit var trackInputAdapter: TrackInputAdapter
 
-
-    private val genreOptions = listOf("Classical", "Salsa", "Rock", "Folk")
-    private val artistOptions =
-        listOf("Sony Music", "EMI", "Discos Fuentes", "Elektra", "Fania Records")
+    private val genreOptions = RandomDataProvider.genreOptions
+    private val artistOptions = RandomDataProvider.artistOptions
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -123,17 +125,17 @@ class CreateAlbumFragment : Fragment() {
     }
 
     private fun setupAdapters() {
-        commentInputAdapter = CommentInputAdapter(emptyList())
-        binding.recyclerViewComments.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = commentInputAdapter
-        }
-
         trackInputAdapter = TrackInputAdapter(emptyList())
         binding.recyclerViewTracks.apply {
             layoutManager = GridLayoutManager(context, 3)
             adapter = trackInputAdapter
         }
+        commentInputAdapter = CommentInputAdapter(emptyList())
+        binding.recyclerViewComments.apply {
+            layoutManager = GridLayoutManager(context, 2)
+            adapter = commentInputAdapter
+        }
+
     }
 
     private fun loadRandomCoverImage() {
@@ -336,7 +338,7 @@ class CreateAlbumFragment : Fragment() {
 
 
     private fun createGuestCollector(onGuestCreated: (Int) -> Unit) {
-        val guestName = "Guest_${System.currentTimeMillis()}"
+        val guestName = "Anónimo ${System.currentTimeMillis()}"
         AlbumServiceAdapter.createCollector(
             name = guestName,
             telephone = "000-0000000",
@@ -394,14 +396,13 @@ class CreateAlbumFragment : Fragment() {
         val inputComment =
             dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.inputComment)
 
-        val inputAuthorLayout =
-            dialogView.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.inputAuthorLayout)
         val inputAuthor =
             dialogView.findViewById<com.google.android.material.textfield.MaterialAutoCompleteTextView>(
                 R.id.inputAuthor
             )
 
         val guestHint = dialogView.findViewById<TextView>(R.id.guest_hint)
+        inputComment.setText(randomComments.random())
 
         // 🔵 Configurar Dropdown con los collectors
         val collectorsNames = currentCollectors.map { it.name }
@@ -464,22 +465,6 @@ class CreateAlbumFragment : Fragment() {
     }
 
     private fun showAddTrackDialog() {
-        val randomSongs = listOf(
-            "Bohemian Rhapsody",
-            "Hotel California",
-            "Stairway to Heaven",
-            "Imagine",
-            "Smells Like Teen Spirit",
-            "Sweet Child O' Mine",
-            "Billie Jean",
-            "Hey Jude",
-            "Wonderwall",
-            "Shape of You"
-        )
-        val randomSong = randomSongs.random()
-        val randomDuration =
-            "${(2..7).random()}:${(0..59).random().toString().padStart(2, '0')} min"
-
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_track, null)
         val inputTrackName =
             dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(
@@ -491,8 +476,8 @@ class CreateAlbumFragment : Fragment() {
             )
 
         // Asignar una canción aleatoria al campo de nombre
-        inputTrackName.setText(randomSong)
-        inputTrackDuration.setText(randomDuration)
+        inputTrackName.setText(randomSongs.random())
+        inputTrackDuration.setText(randomDuration())
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Agregar Canción")
