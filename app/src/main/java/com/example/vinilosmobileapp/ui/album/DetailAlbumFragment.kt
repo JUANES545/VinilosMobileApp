@@ -11,6 +11,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import com.example.vinilosmobileapp.R
 import com.example.vinilosmobileapp.databinding.FragmentDetailAlbumBinding
@@ -19,6 +21,7 @@ import com.example.vinilosmobileapp.model.*
 import com.example.vinilosmobileapp.model.dto.CollectorReferenceDTO
 import com.example.vinilosmobileapp.model.dto.CommentCreateDTO
 import com.example.vinilosmobileapp.ui.album.adapter.CommentInputAdapter
+import com.example.vinilosmobileapp.ui.album.adapter.TrackInputAdapter
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import retrofit2.Call
 import retrofit2.Callback
@@ -33,6 +36,7 @@ class DetailAlbumFragment : Fragment() {
 
     private var albumId: Int = -1
     private lateinit var commentAdapter: CommentInputAdapter
+    private lateinit var trackAdapter: TrackInputAdapter
 
     private val guestNames = listOf(
         "Melómano Anónimo", "Oyente Misterioso", "Amante del Vinilo",
@@ -55,6 +59,19 @@ class DetailAlbumFragment : Fragment() {
 
         (requireActivity() as AppCompatActivity).supportActionBar?.title =
             getString(R.string.detail_album)
+
+        // Initialize the track adapter
+        trackAdapter = TrackInputAdapter(emptyList())
+        binding.recyclerViewTracks.apply {
+            adapter = trackAdapter
+            layoutManager = GridLayoutManager(context, 3)
+        }
+        // Initialize the comment adapter
+        commentAdapter = CommentInputAdapter(emptyList())
+        binding.recyclerViewComments.apply {
+            adapter = commentAdapter
+            layoutManager = GridLayoutManager(context, 2)
+        }
 
         albumId = arguments?.getInt("albumId") ?: -1
 
@@ -113,23 +130,22 @@ class DetailAlbumFragment : Fragment() {
             error(R.drawable.ic_failed_to_load_image)
         }
 
-        val comments = album.comments.ifEmpty { emptyList() }
-        if (comments.isEmpty()) {
-            binding.recyclerViewComments.visibility = View.GONE
-            binding.noCommentsText.visibility = View.VISIBLE
+        // Populate tracks
+        if (!album.tracks.isNullOrEmpty()) {
+            binding.recyclerViewTracks.visibility = View.VISIBLE
+            trackAdapter.updateTracks(album.tracks)
         } else {
-            binding.recyclerViewComments.visibility = View.VISIBLE
-            binding.noCommentsText.visibility = View.GONE
-            commentAdapter.updateComments(comments)
-            binding.recyclerViewComments.scheduleLayoutAnimation()
+            binding.recyclerViewTracks.visibility = View.GONE
         }
 
-        binding.trackList.text = if (album.tracks.isNullOrEmpty()) {
-            "No hay canciones disponibles."
+        // Populate comments
+        if (album.comments.isNotEmpty()) {
+            binding.recyclerViewComments.visibility = View.VISIBLE
+            binding.noCommentsText.visibility = View.GONE
+            commentAdapter.updateComments(album.comments)
         } else {
-            album.tracks.joinToString("\n") { track ->
-                "${track.name} - ${track.duration ?: "?"}"
-            }
+            binding.recyclerViewComments.visibility = View.GONE
+            binding.noCommentsText.visibility = View.VISIBLE
         }
     }
 

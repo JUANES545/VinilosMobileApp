@@ -78,13 +78,14 @@ class HomeFragment : Fragment() {
             binding.swipeRefresh.isRefreshing = false
 
             if (albums != null && albums.isNotEmpty()) {
+                val sortedAlbums = albums.sortedByDescending { it.id }
+
                 binding.recyclerViewAlbums.visibility = View.VISIBLE
                 binding.textError.visibility = View.GONE
                 binding.imageError.visibility = View.GONE
                 binding.buttonRetry.visibility = View.GONE
-                albumAdapter.updateAlbums(albums)
+                albumAdapter.updateAlbums(sortedAlbums)
             } else if (albums != null && albums.isEmpty()) {
-                // La lista llegó vacía
                 showEmptyState()
             }
         }
