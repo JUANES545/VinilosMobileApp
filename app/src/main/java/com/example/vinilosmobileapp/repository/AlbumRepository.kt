@@ -1,6 +1,5 @@
 package com.example.vinilosmobileapp.repository
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.vinilosmobileapp.datasource.remote.AlbumServiceAdapter
 import com.example.vinilosmobileapp.model.Album
@@ -12,29 +11,26 @@ import retrofit2.Response
 
 class AlbumRepository {
 
-    private val albumsLiveData = MutableLiveData<List<Album>?>()
     val createAlbumResult = MutableLiveData<Boolean>()
 
-    fun getAlbums(): LiveData<List<Album>?> {
+    fun getAlbumsWithErrorHandler(
+        onSuccess: (List<Album>) -> Unit,
+        onError: (String) -> Unit
+    ) {
         AlbumServiceAdapter.getAlbums().enqueue(object : Callback<List<Album>> {
             override fun onResponse(call: Call<List<Album>>, response: Response<List<Album>>) {
-                if (response.isSuccessful) {
-                    println("✅ GET exitoso: ${response.body()}")
-                    albumsLiveData.value = response.body() ?: emptyList()
+                if (response.isSuccessful && response.body() != null) {
+                    onSuccess(response.body()!!)
                 } else {
-                    println(" Error en GET, código: ${response.code()}")
-                    albumsLiveData.value = null
+                    onError("Código: ${response.code()}")
                 }
             }
 
             override fun onFailure(call: Call<List<Album>>, t: Throwable) {
-                println("Fallo de red en GET: ${t.localizedMessage}")
-                albumsLiveData.value = null
+                onError("No se pudo conectar al servidor. Verifica tu conexión a Internet.")
             }
         })
-        return albumsLiveData
     }
-
 
     fun createAlbum(albumCreateDTO: AlbumCreateDTO) {
         AlbumServiceAdapter.createAlbum(albumCreateDTO).enqueue(object : Callback<Album> {

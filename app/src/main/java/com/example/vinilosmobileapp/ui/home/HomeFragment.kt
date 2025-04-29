@@ -1,6 +1,7 @@
 package com.example.vinilosmobileapp.ui.home
 
 import android.os.Bundle
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,6 +45,7 @@ class HomeFragment : Fragment() {
         setupRetryButton()
 
         observeAlbums()
+        observeErrors()
 
         binding.fabCreateAlbum.setOnClickListener {
             findNavController().navigate(R.id.action_homeFragment_to_createAlbumFragment)
@@ -52,12 +54,9 @@ class HomeFragment : Fragment() {
 
     private fun setupRecyclerView() {
         albumAdapter = AlbumAdapter(emptyList()) { albumId ->
-            val bundle = Bundle().apply {
-                putInt("albumId", albumId)
-            }
+            val bundle = Bundle().apply { putInt("albumId", albumId) }
             findNavController().navigate(R.id.detailAlbumFragment, bundle)
         }
-
         binding.recyclerViewAlbums.layoutManager = GridLayoutManager(context, 2)
         binding.recyclerViewAlbums.adapter = albumAdapter
     }
@@ -76,16 +75,34 @@ class HomeFragment : Fragment() {
 
     private fun observeAlbums() {
         viewModel.albums.observe(viewLifecycleOwner) { albums ->
-            binding.swipeRefresh.isRefreshing = false // Detener el swipe refresh
+            binding.swipeRefresh.isRefreshing = false
 
             if (albums != null && albums.isNotEmpty()) {
-                albumAdapter.updateAlbums(albums)
                 binding.recyclerViewAlbums.visibility = View.VISIBLE
                 binding.textError.visibility = View.GONE
                 binding.imageError.visibility = View.GONE
                 binding.buttonRetry.visibility = View.GONE
-            } else {
+                albumAdapter.updateAlbums(albums)
+            } else if (albums != null && albums.isEmpty()) {
+                // La lista llegó vacía
                 showEmptyState()
+            }
+        }
+    }
+
+    private fun observeErrors() {
+        viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
+            if (error != null) {
+                binding.swipeRefresh.isRefreshing = false
+                binding.recyclerViewAlbums.visibility = View.GONE
+
+                binding.textError.text = Html.fromHtml("<b>Error de conexión</b><br><br>$error")
+                binding.textError.visibility = View.VISIBLE
+
+                binding.imageError.setImageResource(R.drawable.ic_no_connection)
+                binding.imageError.visibility = View.VISIBLE
+
+                binding.buttonRetry.visibility = View.VISIBLE
             }
         }
     }
@@ -98,11 +115,14 @@ class HomeFragment : Fragment() {
     private fun showEmptyState() {
         binding.swipeRefresh.isRefreshing = false
         binding.recyclerViewAlbums.visibility = View.GONE
-        binding.textError.text = "No hay álbumes disponibles \n \n" +
-            "Crea una nuevo"
+
+        binding.textError.text =
+            Html.fromHtml("No hay álbumes disponibles<br><br><b>Crea uno nuevo.</b>")
         binding.textError.visibility = View.VISIBLE
+
         binding.imageError.setImageResource(R.drawable.ic_empty_list)
         binding.imageError.visibility = View.VISIBLE
+
         binding.buttonRetry.visibility = View.GONE
     }
 

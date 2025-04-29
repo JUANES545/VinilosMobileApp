@@ -13,13 +13,23 @@ class HomeViewModel : ViewModel() {
     private val _albums = MutableLiveData<List<Album>?>()
     val albums: LiveData<List<Album>?> get() = _albums
 
+    private val _errorMessage = MutableLiveData<String?>()
+    val errorMessage: LiveData<String?> get() = _errorMessage
+
     init {
         fetchAlbums()
     }
 
     fun fetchAlbums() {
-        repository.getAlbums().observeForever { fetchedAlbums ->
-            _albums.value = fetchedAlbums
-        }
+        repository.getAlbumsWithErrorHandler(
+            onSuccess = { fetchedAlbums ->
+                _albums.value = fetchedAlbums
+                _errorMessage.value = null
+            },
+            onError = { error ->
+                _albums.value = null
+                _errorMessage.value = error
+            }
+        )
     }
 }
