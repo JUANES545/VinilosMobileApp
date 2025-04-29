@@ -3,7 +3,6 @@
 
 # Logs
 logs
-*.log
 
 # macOS system files
 .DS_Store
