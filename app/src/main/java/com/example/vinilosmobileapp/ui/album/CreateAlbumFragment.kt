@@ -143,7 +143,7 @@ class CreateAlbumFragment : Fragment() {
             scaleType = ImageView.ScaleType.CENTER_CROP
             load(randomImageUrl) {
                 crossfade(true)
-                placeholder(R.drawable.ic_search)
+                placeholder(R.drawable.ic_loading_2)
                 error(R.drawable.ic_failed_to_load_image)
             }
         }
