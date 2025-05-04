@@ -2,6 +2,7 @@ package com.example.vinilosmobileapp.repository
 
 import com.example.vinilosmobileapp.datasource.remote.ArtistServiceAdapter
 import com.example.vinilosmobileapp.model.Artist
+import com.example.vinilosmobileapp.model.ArtistDetail
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -24,5 +25,29 @@ class ArtistRepository {
                 onError(t.localizedMessage ?: "Error de red")
             }
         })
+    }
+
+    fun getArtistDetail(
+        artistId: Int,
+        onSuccess: (ArtistDetail) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        ArtistServiceAdapter.getArtist(artistId)
+            .enqueue(object : Callback<ArtistDetail> {
+                override fun onResponse(
+                    call: Call<ArtistDetail>,
+                    response: Response<ArtistDetail>
+                ) {
+                    if (response.isSuccessful) {
+                        response.body()?.let(onSuccess)
+                    } else {
+                        onError("Error ${response.code()}: ${response.message()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<ArtistDetail>, t: Throwable) {
+                    onError(t.localizedMessage ?: "Error de red")
+                }
+            })
     }
 }

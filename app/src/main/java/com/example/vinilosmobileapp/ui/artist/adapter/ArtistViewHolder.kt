@@ -13,8 +13,17 @@ class ArtistViewHolder(private val binding: ItemArtistBinding) :
         binding.textViewArtistName.text = artist.name
         binding.textViewArtistBio.text = artist.description
         binding.imageViewArtist.load(artist.image) {
-            placeholder(R.drawable.ic_image_placeholder)
+            placeholder(R.drawable.ic_artists)
             error(R.drawable.ic_failed_to_load_image)
+            listener(
+                onSuccess = { _, _ ->
+                    binding.shimmerImageViewArtistCover.hideShimmer()
+                },
+                onError = { _, _ ->
+                    binding.shimmerImageViewArtistCover.hideShimmer()
+                }
+            )
         }
+
     }
 }

@@ -7,7 +7,8 @@ import com.example.vinilosmobileapp.databinding.ItemArtistBinding
 import com.example.vinilosmobileapp.model.Artist
 
 class ArtistAdapter(
-    private var artistList: List<Artist>
+    private var artistList: List<Artist>,
+    private val onClick: (artistId: Int) -> Unit
 ) : RecyclerView.Adapter<ArtistViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArtistViewHolder {
@@ -18,7 +19,11 @@ class ArtistAdapter(
     }
 
     override fun onBindViewHolder(holder: ArtistViewHolder, position: Int) {
-        holder.bind(artistList[position])
+        val artist = artistList[position]
+        holder.bind(artist)
+        holder.itemView.setOnClickListener {
+            onClick(artist.id)
+        }
     }
 
     override fun getItemCount(): Int = artistList.size
