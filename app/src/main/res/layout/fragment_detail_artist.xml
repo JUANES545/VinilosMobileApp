@@ -35,15 +35,24 @@
                     android:layout_height="wrap_content">
 
                     <!-- Imagen del artista -->
-                    <ImageView
-                        android:id="@+id/ivArtist"
+                    <com.facebook.shimmer.ShimmerFrameLayout
+                        android:id="@+id/shimmerArtist"
                         android:layout_width="120dp"
                         android:layout_height="120dp"
-                        android:scaleType="centerCrop"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        tools:srcCompat="@tools:sample/avatars" />
+                        app:shimmer_auto_start="true"
+                        app:shimmer_duration="1500">
+
+                        <ImageView
+                            android:id="@+id/ivArtist"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"
+                            tools:ignore="ContentDescription"
+                            tools:srcCompat="@tools:sample/avatars" />
+                    </com.facebook.shimmer.ShimmerFrameLayout>
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -52,10 +61,10 @@
                         android:layout_marginEnd="16dp"
                         android:gravity="center_vertical"
                         android:orientation="vertical"
-                        app:layout_constraintBottom_toBottomOf="@id/ivArtist"
+                        app:layout_constraintBottom_toBottomOf="@id/shimmerArtist"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/ivArtist"
-                        app:layout_constraintTop_toTopOf="@id/ivArtist">
+                        app:layout_constraintStart_toEndOf="@id/shimmerArtist"
+                        app:layout_constraintTop_toTopOf="@id/shimmerArtist">
 
                         <!-- Nombre -->
                         <TextView
@@ -208,6 +217,16 @@
                 android:layout_marginBottom="16dp"
                 android:orientation="horizontal" />
 
+            <TextView
+                android:id="@+id/textNoAlbums"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginVertical="24dp"
+                android:text="No hay álbumes disponibles"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
             <!-- Sección de Premios -->
             <TextView
                 android:layout_width="match_parent"
@@ -223,6 +242,16 @@
                 android:id="@+id/recyclerPrizes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/textNoPrizes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginVertical="24dp"
+                android:text="No hay premios asignados"
+                android:textSize="16sp"
+                android:visibility="gone" />
 
         </LinearLayout>
 

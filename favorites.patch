@@ -1,0 +1,1412 @@
+Subject: [PATCH] favorites behaviour v2
+---
+Index: app/src/main/java/com/example/vinilosmobileapp/datasource/remote/ArtistService.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/vinilosmobileapp/datasource/remote/ArtistService.kt b/app/src/main/java/com/example/vinilosmobileapp/datasource/remote/ArtistService.kt
+--- a/app/src/main/java/com/example/vinilosmobileapp/datasource/remote/ArtistService.kt	(revision 169a1d99d13d7cd3023fbe33529288f7a85b4c30)
++++ b/app/src/main/java/com/example/vinilosmobileapp/datasource/remote/ArtistService.kt	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -2,8 +2,11 @@
+ 
+ import com.example.vinilosmobileapp.model.Artist
+ import com.example.vinilosmobileapp.model.ArtistDetail
++import com.example.vinilosmobileapp.model.dto.ArtistCreateDTO
+ import retrofit2.Call
++import retrofit2.http.Body
+ import retrofit2.http.GET
++import retrofit2.http.POST
+ import retrofit2.http.Path
+ 
+ interface ArtistService {
+@@ -12,4 +15,7 @@
+ 
+     @GET("musicians/{id}")
+     fun getArtistById(@Path("id") artistId: Int): Call<ArtistDetail>
++
++    @POST("musicians")
++    fun createMusician(@Body artist: ArtistCreateDTO): Call<Artist>
+ }
+Index: app/src/main/java/com/example/vinilosmobileapp/datasource/remote/ArtistServiceAdapter.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/vinilosmobileapp/datasource/remote/ArtistServiceAdapter.kt b/app/src/main/java/com/example/vinilosmobileapp/datasource/remote/ArtistServiceAdapter.kt
+--- a/app/src/main/java/com/example/vinilosmobileapp/datasource/remote/ArtistServiceAdapter.kt	(revision 169a1d99d13d7cd3023fbe33529288f7a85b4c30)
++++ b/app/src/main/java/com/example/vinilosmobileapp/datasource/remote/ArtistServiceAdapter.kt	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -1,12 +1,18 @@
+ package com.example.vinilosmobileapp.datasource.remote
+ 
++import com.example.vinilosmobileapp.model.Artist
+ import com.example.vinilosmobileapp.model.ArtistDetail
++import com.example.vinilosmobileapp.model.dto.ArtistCreateDTO
+ import retrofit2.Call
+ 
+ object ArtistServiceAdapter {
+     private val service = RetrofitClient.retrofit.create(ArtistService::class.java)
++
+     fun getArtists() = service.getArtists()
+ 
+     fun getArtist(artistId: Int): Call<ArtistDetail> =
+         service.getArtistById(artistId)
++
++    fun createArtist(dto: ArtistCreateDTO): Call<Artist> =
++        service.createMusician(dto)
+ }
+Index: app/src/main/java/com/example/vinilosmobileapp/model/dto/ArtistCreateDTO.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/vinilosmobileapp/model/dto/ArtistCreateDTO.kt b/app/src/main/java/com/example/vinilosmobileapp/model/dto/ArtistCreateDTO.kt
+new file mode 100644
+--- /dev/null	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
++++ b/app/src/main/java/com/example/vinilosmobileapp/model/dto/ArtistCreateDTO.kt	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -0,0 +1,8 @@
++package com.example.vinilosmobileapp.model.dto
++
++data class ArtistCreateDTO(
++    val name: String,
++    val image: String,
++    val description: String,
++    val birthDate: String
++)
+Index: app/src/main/java/com/example/vinilosmobileapp/repository/ArtistRepository.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/vinilosmobileapp/repository/ArtistRepository.kt b/app/src/main/java/com/example/vinilosmobileapp/repository/ArtistRepository.kt
+--- a/app/src/main/java/com/example/vinilosmobileapp/repository/ArtistRepository.kt	(revision 169a1d99d13d7cd3023fbe33529288f7a85b4c30)
++++ b/app/src/main/java/com/example/vinilosmobileapp/repository/ArtistRepository.kt	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -1,13 +1,20 @@
+ package com.example.vinilosmobileapp.repository
+ 
++import androidx.lifecycle.LiveData
++import androidx.lifecycle.MutableLiveData
+ import com.example.vinilosmobileapp.datasource.remote.ArtistServiceAdapter
+ import com.example.vinilosmobileapp.model.Artist
+ import com.example.vinilosmobileapp.model.ArtistDetail
++import com.example.vinilosmobileapp.model.dto.ArtistCreateDTO
+ import retrofit2.Call
+ import retrofit2.Callback
+ import retrofit2.Response
+ 
+ class ArtistRepository {
++
++    private val _createResult = MutableLiveData<Boolean>()
++    val createResult: LiveData<Boolean> = _createResult
++
+     fun getArtistsWithErrorHandler(
+         onSuccess: (List<Artist>) -> Unit,
+         onError: (String) -> Unit
+@@ -50,4 +57,18 @@
+                 }
+             })
+     }
++
++    fun createArtist(dto: ArtistCreateDTO) {
++        ArtistServiceAdapter.createArtist(dto)
++            .enqueue(object : Callback<Artist> {
++                override fun onResponse(call: Call<Artist>, resp: Response<Artist>) {
++                    _createResult.value = resp.isSuccessful
++                }
++
++                override fun onFailure(call: Call<Artist>, t: Throwable) {
++                    _createResult.value = false
++                }
++            })
++    }
++
+ }
+Index: app/src/main/java/com/example/vinilosmobileapp/ui/artist/ArtistDetailFragment.kt
+===================================================================
+diff --git a/app/src/main/java/com/example/vinilosmobileapp/ui/artist/ArtistDetailFragment.kt b/app/src/main/java/com/example/vinilosmobileapp/ui/artist/ArtistDetailFragment.kt
+deleted file mode 100644
+--- a/app/src/main/java/com/example/vinilosmobileapp/ui/artist/ArtistDetailFragment.kt	(revision 169a1d99d13d7cd3023fbe33529288f7a85b4c30)
++++ /dev/null	(revision 169a1d99d13d7cd3023fbe33529288f7a85b4c30)
+@@ -1,92 +0,0 @@
+-package com.example.vinilosmobileapp.ui.artist
+-
+-import android.os.Bundle
+-import android.view.LayoutInflater
+-import android.view.View
+-import android.view.ViewGroup
+-import android.widget.Toast
+-import androidx.appcompat.app.AppCompatActivity
+-import androidx.fragment.app.Fragment
+-import androidx.fragment.app.viewModels
+-import androidx.navigation.fragment.findNavController
+-import coil.load
+-import com.example.vinilosmobileapp.R
+-import com.example.vinilosmobileapp.databinding.FragmentArtistDetailBinding
+-import com.example.vinilosmobileapp.ui.artist.adapter.PrizeAdapter
+-import com.example.vinilosmobileapp.ui.home.adapter.AlbumAdapter
+-
+-class ArtistDetailFragment : Fragment() {
+-
+-    private var _binding: FragmentArtistDetailBinding? = null
+-    private val binding get() = _binding!!
+-
+-    private val viewModel: ArtistDetailViewModel by viewModels()
+-    private lateinit var albumsAdapter: AlbumAdapter
+-    private lateinit var prizesAdapter: PrizeAdapter
+-
+-    override fun onCreateView(
+-        inflater: LayoutInflater, container: ViewGroup?,
+-        savedInstanceState: Bundle?
+-    ) = FragmentArtistDetailBinding.inflate(inflater, container, false)
+-        .also { _binding = it }
+-        .root
+-
+-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+-        (requireActivity() as AppCompatActivity).supportActionBar?.title =
+-            getString(R.string.detail_artist)
+-        val artistId = arguments?.getInt("artistId") ?: -1
+-        if (artistId < 0) {
+-            Toast.makeText(requireContext(), "ID de artista inválido", Toast.LENGTH_SHORT).show()
+-            return
+-        }
+-
+-        // Recycler para álbumes
+-        albumsAdapter = AlbumAdapter(emptyList()) { albumId ->
+-            val bundle = Bundle().apply { putInt("albumId", albumId) }
+-            findNavController().navigate(R.id.detailAlbumFragment, bundle)
+-        }
+-        binding.recyclerAlbums.apply {
+-            adapter = albumsAdapter
+-        }
+-
+-        // Recycler para premios
+-        prizesAdapter = PrizeAdapter(emptyList())
+-        binding.recyclerPrizes.adapter = prizesAdapter
+-
+-        // Observers
+-        viewModel.artist.observe(viewLifecycleOwner) { artist ->
+-            artist?.let { showArtist(it) }
+-        }
+-        viewModel.error.observe(viewLifecycleOwner) { err ->
+-            err?.let {
+-                binding.progressBar.visibility = View.GONE
+-                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+-            }
+-        }
+-
+-        // Fetch
+-        binding.progressBar.visibility = View.VISIBLE
+-        viewModel.fetchArtist(artistId)
+-    }
+-
+-    private fun showArtist(a: com.example.vinilosmobileapp.model.ArtistDetail) {
+-        binding.progressBar.visibility = View.GONE
+-        binding.contentLayout.visibility = View.VISIBLE
+-
+-        binding.ivArtist.load(a.image) {
+-            placeholder(R.drawable.ic_artists)
+-            error(R.drawable.ic_failed_to_load_image)
+-        }
+-        binding.tvName.text = a.name
+-        binding.tvDescription.text = a.description
+-        binding.tvBirthDate.text = a.birthDate.take(10)
+-
+-        albumsAdapter.updateAlbums(a.albums)
+-        prizesAdapter.updatePrizes(a.performerPrizes)
+-    }
+-
+-    override fun onDestroyView() {
+-        super.onDestroyView()
+-        _binding = null
+-    }
+-}
+Index: app/src/main/java/com/example/vinilosmobileapp/ui/artist/ArtistFragment.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/vinilosmobileapp/ui/artist/ArtistFragment.kt b/app/src/main/java/com/example/vinilosmobileapp/ui/artist/ArtistFragment.kt
+--- a/app/src/main/java/com/example/vinilosmobileapp/ui/artist/ArtistFragment.kt	(revision 169a1d99d13d7cd3023fbe33529288f7a85b4c30)
++++ b/app/src/main/java/com/example/vinilosmobileapp/ui/artist/ArtistFragment.kt	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -4,13 +4,17 @@
+ import android.view.LayoutInflater
+ import android.view.View
+ import android.view.ViewGroup
++import androidx.appcompat.app.AppCompatActivity
+ import androidx.fragment.app.Fragment
++import androidx.fragment.app.setFragmentResultListener
+ import androidx.fragment.app.viewModels
+ import androidx.navigation.fragment.findNavController
+ import androidx.recyclerview.widget.GridLayoutManager
+ import com.example.vinilosmobileapp.R
+ import com.example.vinilosmobileapp.databinding.FragmentArtistBinding
++import com.example.vinilosmobileapp.model.Artist
+ import com.example.vinilosmobileapp.ui.artist.adapter.ArtistAdapter
++import com.example.vinilosmobileapp.utils.FavoritesManager
+ 
+ class ArtistFragment : Fragment() {
+ 
+@@ -18,6 +22,8 @@
+     private val binding get() = _binding!!
+     private val viewModel: ArtistViewModel by viewModels()
+     private lateinit var artistAdapter: ArtistAdapter
++    private var showingFavorites = false
++    private var allArtists = emptyList<Artist>()
+ 
+     override fun onCreateView(
+         inflater: LayoutInflater, container: ViewGroup?,
+@@ -30,9 +36,12 @@
+         super.onViewCreated(view, savedInstanceState)
+ 
+         setupRecyclerView()
++        setupFabListeners()
+         setupSwipeRefresh()
+         setupRetryButton()
+         observeViewModel()
++
++        setupFabListeners()
+     }
+ 
+     private fun setupRecyclerView() {
+@@ -66,6 +75,8 @@
+             binding.swipeRefreshArtist.isRefreshing = false
+             if (!list.isNullOrEmpty()) {
+                 artistAdapter.updateArtists(list)
++                allArtists = list
++                applyFilter()
+                 binding.recyclerViewArtists.visibility = View.VISIBLE
+                 binding.errorLayoutArtist.visibility = View.GONE
+             } else {
+@@ -83,6 +94,57 @@
+         }
+     }
+ 
++    private fun setupFabListeners() {
++        // Set the listener for artist creation result
++        setFragmentResultListener("artist_created") { _, _ ->
++            viewModel.fetchArtists()
++        }
++
++        binding.fabAddArtist.setOnClickListener {
++            findNavController().navigate(R.id.action_artist_to_createArtist)
++        }
++        // Toggle favorites filter
++        binding.fabFilterFavorites.setOnClickListener {
++            showingFavorites = !showingFavorites
++            updateFilterIcon()
++            (requireActivity() as AppCompatActivity).supportActionBar?.title =
++                if (showingFavorites) "Artistas Favoritos" else "Todos los Artistas"
++            applyFilter()
++        }
++    }
++
++    private fun updateFilterIcon() {
++        val icon = if (!showingFavorites) R.drawable.ic_star_filled else R.drawable.ic_star_outline
++        binding.fabFilterFavorites.post {
++            binding.fabFilterFavorites.setImageResource(icon)
++        }
++    }
++
++    private fun applyFilter() {
++        val listToShow = if (showingFavorites) {
++            allArtists.filter { FavoritesManager.isFavorite(requireContext(), it.id) }
++        } else {
++            allArtists
++        }
++
++        if (listToShow.isEmpty()) {
++            binding.errorLayoutArtist.visibility = View.VISIBLE
++            binding.imageErrorArtist.setImageResource(R.drawable.ic_empty_list) // Set empty list image
++            binding.buttonRetryArtist.visibility = if (showingFavorites) View.GONE else View.VISIBLE
++            binding.textErrorArtist.text = if (showingFavorites) {
++                "No tienes artistas favoritos :c"
++            } else {
++                "Error al cargar artistas."
++            }
++        } else {
++            binding.recyclerViewArtists.visibility = View.VISIBLE
++            binding.errorLayoutArtist.visibility = View.GONE
++            binding.buttonRetryArtist.visibility = View.GONE
++        }
++
++        artistAdapter.updateArtists(listToShow)
++    }
++
+     override fun onDestroyView() {
+         super.onDestroyView()
+         _binding = null
+Index: app/src/main/java/com/example/vinilosmobileapp/ui/artist/CreateArtistFragment.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/vinilosmobileapp/ui/artist/CreateArtistFragment.kt b/app/src/main/java/com/example/vinilosmobileapp/ui/artist/CreateArtistFragment.kt
+new file mode 100644
+--- /dev/null	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
++++ b/app/src/main/java/com/example/vinilosmobileapp/ui/artist/CreateArtistFragment.kt	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -0,0 +1,157 @@
++package com.example.vinilosmobileapp.ui.artist
++
++import android.app.DatePickerDialog
++import android.os.Bundle
++import android.view.LayoutInflater
++import android.view.View
++import android.view.ViewGroup
++import android.widget.ImageView
++import android.widget.Toast
++import androidx.fragment.app.Fragment
++import androidx.fragment.app.setFragmentResult
++import androidx.fragment.app.viewModels
++import androidx.navigation.fragment.findNavController
++import coil.load
++import com.example.vinilosmobileapp.R
++import com.example.vinilosmobileapp.databinding.FragmentCreateArtistBinding
++import com.example.vinilosmobileapp.model.dto.ArtistCreateDTO
++import com.example.vinilosmobileapp.utils.RandomDataProvider
++import java.text.SimpleDateFormat
++import java.util.*
++
++class CreateArtistFragment : Fragment() {
++
++    private var _binding: FragmentCreateArtistBinding? = null
++    private val binding get() = _binding!!
++    private val vm: CreateArtistViewModel by viewModels()
++    private val cal = Calendar.getInstance()
++    private val sdf = SimpleDateFormat("yyyy-MM-dd'T'00:00:00.000'Z'", Locale.getDefault())
++    private var selectedPhotoUrl: String? = null
++
++    override fun onCreateView(i: LayoutInflater, c: ViewGroup?, s: Bundle?) =
++        FragmentCreateArtistBinding.inflate(i, c, false).also { _binding = it }.root
++
++    override fun onViewCreated(v: View, s: Bundle?) {
++        super.onViewCreated(v, s)
++
++        setupArtistName()
++        setupBirthDateCalendar()
++        setupDescription()
++
++        binding.imageUploadContainer.setOnClickListener { loadRandomProfilePhoto() }
++
++        binding.btnCreateArtist.setOnClickListener {
++            var valid = true
++            listOf(binding.tilName, binding.tilBirth, binding.tilDesc).forEach { it.error = null }
++
++            if (binding.etName.text.isNullOrBlank()) {
++                binding.tilName.error = "Nombre obligatorio"; valid = false
++            }
++            if (binding.etBirth.text.isNullOrBlank()) {
++                binding.tilBirth.error = "Fecha de nacimiento Requerida"; valid = false
++            }
++            if (binding.etDesc.text.isNullOrBlank()) {
++                binding.tilDesc.error = "Descripción Requerido"; valid = false
++            }
++            if (!valid) return@setOnClickListener
++
++            val dto = ArtistCreateDTO(
++                name = binding.etName.text.toString().trim(),
++                image = selectedPhotoUrl ?: "https://http.cat/images/102.jpg",
++                birthDate = sdf.format(cal.time),
++                description = binding.etDesc.text.toString().trim()
++            )
++
++            vm.createArtist(dto)
++        }
++
++        vm.createResult.observe(viewLifecycleOwner) { ok ->
++            if (ok) {
++                Toast.makeText(requireContext(), "Artista creado", Toast.LENGTH_SHORT).show()
++                // avisamos para que el ArtistFragment refresque
++                setFragmentResult("artist_created", Bundle())
++                findNavController().popBackStack()
++            } else {
++                Toast.makeText(requireContext(), "Error al crear artista", Toast.LENGTH_SHORT)
++                    .show()
++            }
++        }
++    }
++
++    private fun setupArtistName() {
++        var isFirstClick = true
++        binding.etName.setOnClickListener {
++            if (isFirstClick && binding.etName.text.isNullOrBlank()) {
++                val randomName = RandomDataProvider.artistName.random()
++                binding.etName.setText(randomName)
++                isFirstClick = false
++            }
++        }
++    }
++
++    private fun setupBirthDateCalendar() {
++        // Generar una fecha aleatoria entre 1955 y 2006
++        val randomYear = (1955..2006).random()
++        val randomMonth = (0..11).random()
++        val randomDay = (1..cal.getActualMaximum(Calendar.DAY_OF_MONTH)).random()
++        cal.set(randomYear, randomMonth, randomDay)
++
++        // Muestra fecha aleatoria en el campo al abrir por primera vez
++        binding.etBirth.setText(
++            SimpleDateFormat(
++                "yyyy-MM-dd",
++                Locale.getDefault()
++            ).format(cal.time)
++        )
++
++        binding.etBirth.setOnClickListener {
++            DatePickerDialog(
++                requireContext(),
++                { _, y, m, d ->
++                    cal.set(y, m, d)
++                    binding.etBirth.setText(
++                        SimpleDateFormat(
++                            "yyyy-MM-dd",
++                            Locale.getDefault()
++                        ).format(cal.time)
++                    )
++                },
++                cal.get(Calendar.YEAR),
++                cal.get(Calendar.MONTH),
++                cal.get(Calendar.DAY_OF_MONTH)
++            ).show()
++        }
++    }
++
++    private fun setupDescription() {
++        var isFirstClick = true
++        binding.etDesc.setOnClickListener {
++            if (isFirstClick && binding.etDesc.text.isNullOrBlank()) {
++                val randomDescription = RandomDataProvider.artistDescriptions.random()
++                binding.etDesc.setText(randomDescription)
++                isFirstClick = false
++            }
++        }
++    }
++
++    private fun loadRandomProfilePhoto() {
++        val randomImageUrl = "https://i.pravatar.cc/300?u=${System.currentTimeMillis()}"
++
++        binding.imagePreview.apply {
++            layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT
++            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
++            scaleType = ImageView.ScaleType.CENTER_CROP
++            load(randomImageUrl) {
++                crossfade(true)
++                placeholder(R.drawable.ic_loading_2)
++                error(R.drawable.ic_profile)
++            }
++        }
++        selectedPhotoUrl = randomImageUrl
++    }
++
++    override fun onDestroyView() {
++        super.onDestroyView()
++        _binding = null
++    }
++}
+Index: app/src/main/java/com/example/vinilosmobileapp/ui/artist/CreateArtistViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/vinilosmobileapp/ui/artist/CreateArtistViewModel.kt b/app/src/main/java/com/example/vinilosmobileapp/ui/artist/CreateArtistViewModel.kt
+new file mode 100644
+--- /dev/null	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
++++ b/app/src/main/java/com/example/vinilosmobileapp/ui/artist/CreateArtistViewModel.kt	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -0,0 +1,12 @@
++package com.example.vinilosmobileapp.ui.artist
++
++import androidx.lifecycle.LiveData
++import androidx.lifecycle.ViewModel
++import com.example.vinilosmobileapp.model.dto.ArtistCreateDTO
++import com.example.vinilosmobileapp.repository.ArtistRepository
++
++class CreateArtistViewModel : ViewModel() {
++    private val repo = ArtistRepository()
++    val createResult: LiveData<Boolean> = repo.createResult
++    fun createArtist(dto: ArtistCreateDTO) = repo.createArtist(dto)
++}
+Index: app/src/main/java/com/example/vinilosmobileapp/ui/artist/DetailArtistFragment.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/vinilosmobileapp/ui/artist/DetailArtistFragment.kt b/app/src/main/java/com/example/vinilosmobileapp/ui/artist/DetailArtistFragment.kt
+new file mode 100644
+--- /dev/null	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
++++ b/app/src/main/java/com/example/vinilosmobileapp/ui/artist/DetailArtistFragment.kt	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -0,0 +1,139 @@
++package com.example.vinilosmobileapp.ui.artist
++
++import android.annotation.SuppressLint
++import android.os.Bundle
++import android.view.LayoutInflater
++import android.view.View
++import android.view.ViewGroup
++import android.widget.Toast
++import androidx.appcompat.app.AppCompatActivity
++import androidx.fragment.app.Fragment
++import androidx.fragment.app.viewModels
++import androidx.navigation.fragment.findNavController
++import coil.load
++import com.example.vinilosmobileapp.R
++import com.example.vinilosmobileapp.databinding.FragmentDetailArtistBinding
++import com.example.vinilosmobileapp.datasource.local.AlbumProvider
++import com.example.vinilosmobileapp.model.ArtistDetail
++import com.example.vinilosmobileapp.ui.artist.adapter.PrizeAdapter
++import com.example.vinilosmobileapp.ui.home.adapter.AlbumAdapter
++
++class DetailArtistFragment : Fragment() {
++
++    private var _binding: FragmentDetailArtistBinding? = null
++    private val binding get() = _binding!!
++
++    private val viewModel: DetailArtistViewModel by viewModels()
++    private lateinit var albumsAdapter: AlbumAdapter
++    private lateinit var prizesAdapter: PrizeAdapter
++
++    override fun onCreateView(
++        inflater: LayoutInflater, container: ViewGroup?,
++        savedInstanceState: Bundle?
++    ) = FragmentDetailArtistBinding.inflate(inflater, container, false)
++        .also { _binding = it }
++        .root
++
++    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
++        (requireActivity() as AppCompatActivity).supportActionBar?.title =
++            getString(R.string.detail_artist)
++        val artistId = arguments?.getInt("artistId") ?: -1
++        if (artistId < 0) {
++            Toast.makeText(requireContext(), "ID de artista inválido", Toast.LENGTH_SHORT).show()
++            return
++        }
++
++        setupMusicType()
++        setupAlbums()
++        setupPrizes()
++
++        // Observers
++        viewModel.artist.observe(viewLifecycleOwner) { artist ->
++            artist?.let { showArtistDetails(it) }
++        }
++        viewModel.error.observe(viewLifecycleOwner) { err ->
++            err?.let {
++                binding.progressBar.visibility = View.GONE
++                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
++            }
++        }
++
++        // Fetch
++        binding.progressBar.visibility = View.VISIBLE
++        viewModel.fetchArtist(artistId)
++    }
++
++    @SuppressLint("SetTextI18n")
++    private fun setupMusicType() {
++        val randomAlbum = AlbumProvider.getAlbums().random()
++        val genre = randomAlbum.genre
++        val recordLabel = randomAlbum.recordLabel
++        binding.tvRoleLocation.text = "$genre - $recordLabel"
++    }
++
++    private fun setupPrizes() {
++        with(binding) {
++            prizesAdapter = PrizeAdapter(emptyList())
++            recyclerPrizes.adapter = prizesAdapter
++
++            tvStatPrizes.text = prizesAdapter.itemCount.toString()
++            if (prizesAdapter.itemCount == 0) {
++                textNoPrizes.visibility = View.VISIBLE
++                recyclerPrizes.visibility = View.GONE
++            } else {
++                textNoPrizes.visibility = View.GONE
++                recyclerPrizes.visibility = View.VISIBLE
++            }
++        }
++    }
++
++    private fun setupAlbums() {
++        albumsAdapter = AlbumAdapter(emptyList()) { albumId ->
++            val bundle = Bundle().apply { putInt("albumId", albumId) }
++            findNavController().navigate(R.id.detailAlbumFragment, bundle)
++        }
++        with(binding) {
++            recyclerAlbums.adapter = albumsAdapter
++
++            tvStatAlbums.text = albumsAdapter.itemCount.toString()
++            if (albumsAdapter.itemCount == 0) {
++                textNoAlbums.visibility = View.VISIBLE
++                recyclerAlbums.visibility = View.GONE
++            } else {
++                textNoAlbums.visibility = View.GONE
++                recyclerAlbums.visibility = View.VISIBLE
++            }
++        }
++    }
++
++    private fun showArtistDetails(artistDetail: ArtistDetail) {
++        with(binding) {
++            progressBar.visibility = View.GONE
++            contentLayout.visibility = View.VISIBLE
++
++            ivArtist.load(artistDetail.image) {
++                placeholder(R.drawable.ic_artists)
++                error(R.drawable.ic_failed_to_load_image)
++                listener(
++                    onSuccess = { _, _ ->
++                        shimmerArtist.hideShimmer()
++                    },
++                    onError = { _, _ ->
++                        shimmerArtist.hideShimmer()
++                    }
++                )
++            }
++            tvName.text = artistDetail.name
++            tvDescription.text = artistDetail.description
++            tvBirthDate.text = artistDetail.birthDate.take(10)
++        }
++
++        albumsAdapter.updateAlbums(artistDetail.albums)
++        prizesAdapter.updatePrizes(artistDetail.performerPrizes)
++    }
++
++    override fun onDestroyView() {
++        super.onDestroyView()
++        _binding = null
++    }
++}
+Index: app/src/main/java/com/example/vinilosmobileapp/ui/artist/ArtistDetailViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/vinilosmobileapp/ui/artist/ArtistDetailViewModel.kt b/app/src/main/java/com/example/vinilosmobileapp/ui/artist/DetailArtistViewModel.kt
+rename from app/src/main/java/com/example/vinilosmobileapp/ui/artist/ArtistDetailViewModel.kt
+rename to app/src/main/java/com/example/vinilosmobileapp/ui/artist/DetailArtistViewModel.kt
+--- a/app/src/main/java/com/example/vinilosmobileapp/ui/artist/ArtistDetailViewModel.kt	(revision 169a1d99d13d7cd3023fbe33529288f7a85b4c30)
++++ b/app/src/main/java/com/example/vinilosmobileapp/ui/artist/DetailArtistViewModel.kt	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -6,7 +6,7 @@
+ import com.example.vinilosmobileapp.model.ArtistDetail
+ import com.example.vinilosmobileapp.repository.ArtistRepository
+ 
+-class ArtistDetailViewModel : ViewModel() {
++class DetailArtistViewModel : ViewModel() {
+     private val repo = ArtistRepository()
+ 
+     private val _artist = MutableLiveData<ArtistDetail?>()
+Index: app/src/main/java/com/example/vinilosmobileapp/ui/artist/adapter/ArtistViewHolder.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/vinilosmobileapp/ui/artist/adapter/ArtistViewHolder.kt b/app/src/main/java/com/example/vinilosmobileapp/ui/artist/adapter/ArtistViewHolder.kt
+--- a/app/src/main/java/com/example/vinilosmobileapp/ui/artist/adapter/ArtistViewHolder.kt	(revision 169a1d99d13d7cd3023fbe33529288f7a85b4c30)
++++ b/app/src/main/java/com/example/vinilosmobileapp/ui/artist/adapter/ArtistViewHolder.kt	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -5,6 +5,7 @@
+ import com.example.vinilosmobileapp.R
+ import com.example.vinilosmobileapp.databinding.ItemArtistBinding
+ import com.example.vinilosmobileapp.model.Artist
++import com.example.vinilosmobileapp.utils.FavoritesManager
+ 
+ class ArtistViewHolder(private val binding: ItemArtistBinding) :
+     RecyclerView.ViewHolder(binding.root) {
+@@ -25,5 +26,16 @@
+             )
+         }
+ 
++        setupFavorites(artist)
+     }
++
++    private fun setupFavorites(artist: Artist) {
++        val isFavorite = FavoritesManager.isFavorite(binding.root.context, artist.id)
++        binding.btnFavorite.isSelected = isFavorite
++        binding.btnFavorite.setOnClickListener {
++            FavoritesManager.toggleFavorite(binding.root.context, artist.id)
++            binding.btnFavorite.isSelected = !binding.btnFavorite.isSelected
++        }
++    }
++
+ }
+Index: app/src/main/java/com/example/vinilosmobileapp/utils/FavoritesManager.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/vinilosmobileapp/utils/FavoritesManager.kt b/app/src/main/java/com/example/vinilosmobileapp/utils/FavoritesManager.kt
+new file mode 100644
+--- /dev/null	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
++++ b/app/src/main/java/com/example/vinilosmobileapp/utils/FavoritesManager.kt	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -0,0 +1,22 @@
++package com.example.vinilosmobileapp.utils
++
++import android.content.Context
++import android.content.SharedPreferences
++
++object FavoritesManager {
++    private const val PREFS = "artist_prefs"
++    private const val KEY_FAVS = "favorite_artists"
++
++    private fun prefs(ctx: Context): SharedPreferences =
++        ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
++
++    fun isFavorite(ctx: Context, artistId: Int): Boolean =
++        prefs(ctx).getStringSet(KEY_FAVS, emptySet())!!.contains(artistId.toString())
++
++    fun toggleFavorite(ctx: Context, artistId: Int) {
++        val set = prefs(ctx).getStringSet(KEY_FAVS, mutableSetOf())!!.toMutableSet()
++        val key = artistId.toString()
++        if (set.contains(key)) set.remove(key) else set.add(key)
++        prefs(ctx).edit().putStringSet(KEY_FAVS, set).apply()
++    }
++}
+Index: app/src/main/java/com/example/vinilosmobileapp/utils/randomDataProvider.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/vinilosmobileapp/utils/randomDataProvider.kt b/app/src/main/java/com/example/vinilosmobileapp/utils/randomDataProvider.kt
+--- a/app/src/main/java/com/example/vinilosmobileapp/utils/randomDataProvider.kt	(revision 169a1d99d13d7cd3023fbe33529288f7a85b4c30)
++++ b/app/src/main/java/com/example/vinilosmobileapp/utils/randomDataProvider.kt	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -1,48 +1,72 @@
+ package com.example.vinilosmobileapp.utils
+ 
+-        object RandomDataProvider {
++object RandomDataProvider {
+ 
+-            val randomComments = listOf(
+-                "¡Este álbum es increíble!",
+-                "Me encanta la música de este artista.",
+-                "Una obra maestra, sin duda.",
+-                "¡No puedo dejar de escucharlo!",
+-                "Este álbum me trae muchos recuerdos.",
+-                "¡Altamente recomendado!"
+-            )
++    val randomComments = listOf(
++        "¡Este álbum es increíble!",
++        "Me encanta la música de este artista.",
++        "Una obra maestra, sin duda.",
++        "¡No puedo dejar de escucharlo!",
++        "Este álbum me trae muchos recuerdos.",
++        "¡Altamente recomendado!"
++    )
+ 
+-            val randomSongs = listOf(
+-                "Bohemian Rhapsody",
+-                "Hotel California",
+-                "Stairway to Heaven",
+-                "Imagine",
+-                "Smells Like Teen Spirit",
+-                "Sweet Child O' Mine",
+-                "Billie Jean",
+-                "Hey Jude",
+-                "Wonderwall",
+-                "Shape of You"
+-            )
++    val randomSongs = listOf(
++        "Bohemian Rhapsody",
++        "Hotel California",
++        "Stairway to Heaven",
++        "Imagine",
++        "Smells Like Teen Spirit",
++        "Sweet Child O' Mine",
++        "Billie Jean",
++        "Hey Jude",
++        "Wonderwall",
++        "Shape of You"
++    )
+ 
+-            val guestNames = listOf(
+-                "Melómano Anónimo",
+-                "Oyente Misterioso",
+-                "Amante del Vinilo",
+-                "Coleccionista X",
+-                "Música para el alma"
+-            )
++    val guestNames = listOf(
++        "Melómano Anónimo",
++        "Oyente Misterioso",
++        "Amante del Vinilo",
++        "Coleccionista X",
++        "Música para el alma"
++    )
+ 
+-            val genreOptions = listOf("Classical", "Salsa", "Rock", "Folk")
++    val genreOptions = listOf("Classical", "Salsa", "Rock", "Folk")
+ 
+-            val artistOptions = listOf(
+-                "Sony Music",
+-                "EMI",
+-                "Discos Fuentes",
+-                "Elektra",
+-                "Fania Records"
+-            )
++    val artistOptions = listOf(
++        "Sony Music",
++        "EMI",
++        "Discos Fuentes",
++        "Elektra",
++        "Fania Records"
++    )
+ 
+-            fun randomDuration(): String {
+-                return "${(2..7).random()}:${(0..59).random().toString().padStart(2, '0')} min"
+-            }
+-        }
++    val artistName = listOf(
++        "Michael Jackson",
++        "Madonna",
++        "Queen",
++        "The Beatles",
++        "Elvis Presley",
++        "Bob Dylan",
++        "David Bowie",
++        "Juanes",
++        "Stevie Wonder",
++        "Aretha Franklin",
++        "Migue :v",
++        "Jazz :v",
++        "Nata :v",
++    )
++    val artistDescriptions = listOf(
++        "Artista visionario con una carrera llena de éxitos, reconocimientos y contribuciones al mundo del arte.",
++        "Pionero en su género, conocido por su estilo único, apasionante y su capacidad de innovar constantemente.",
++        "Creador de obras maestras que han marcado generaciones y redefinido los estándares de la industria.",
++        "Un talento excepcional que combina técnica, emoción y una profunda conexión con su audiencia en cada obra.",
++        "Reconocido por su impacto cultural, su legado artístico y su influencia en artistas contemporáneos.",
++        "Innovador constante, siempre explorando nuevos horizontes musicales y desafiando los límites creativos."
++    )
++
++    fun randomDuration(): String {
++        return "${(2..7).random()}:${(0..59).random().toString().padStart(2, '0')} min"
++    }
++}
+Index: app/src/main/res/drawable/bg_circle_transparent.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/drawable/bg_circle_transparent.xml b/app/src/main/res/drawable/bg_circle_transparent.xml
+new file mode 100644
+--- /dev/null	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
++++ b/app/src/main/res/drawable/bg_circle_transparent.xml	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -0,0 +1,8 @@
++<shape xmlns:android="http://schemas.android.com/apk/res/android"
++    android:shape="oval">
++    <solid android:color="@android:color/transparent" />
++    <stroke
++        android:width="1dp"
++        android:color="@color/darker_gray_transparent" />
++    <solid android:color="@color/gray_transparent" />
++</shape>
+Index: app/src/main/res/drawable/ic_star_filled.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/drawable/ic_star_filled.xml b/app/src/main/res/drawable/ic_star_filled.xml
+new file mode 100644
+--- /dev/null	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
++++ b/app/src/main/res/drawable/ic_star_filled.xml	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -0,0 +1,9 @@
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="24dp"
++    android:height="24dp"
++    android:viewportWidth="24"
++    android:viewportHeight="24">
++  <path
++      android:pathData="M12,17.27 L18.18,21l-1.64,-7.03L22,9.24l-7.19,-0.61L12,2 9.19,8.63 2,9.24l5.46,4.73L5.82,21 12,17.27z"
++      android:fillColor="#F19E39"/>
++</vector>
+Index: app/src/main/res/drawable/ic_star_outline.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/drawable/ic_star_outline.xml b/app/src/main/res/drawable/ic_star_outline.xml
+new file mode 100644
+--- /dev/null	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
++++ b/app/src/main/res/drawable/ic_star_outline.xml	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -0,0 +1,9 @@
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="24dp"
++    android:height="24dp"
++    android:viewportWidth="960"
++    android:viewportHeight="960">
++  <path
++      android:pathData="M333.33,701 L480,613l146.67,89 -39,-166.67 129,-112 -170,-15L480,251l-66.67,156.33 -170,15 129,112.34 -39,166.33ZM233,840l65,-281L80,370l288,-25 112,-265 112,265 288,25 -218,189 65,281 -247,-149 -247,149ZM480,486.67Z"
++      android:fillColor="#F19E39"/>
++</vector>
+Index: app/src/main/res/drawable/selector_favorite.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/drawable/selector_favorite.xml b/app/src/main/res/drawable/selector_favorite.xml
+new file mode 100644
+--- /dev/null	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
++++ b/app/src/main/res/drawable/selector_favorite.xml	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -0,0 +1,5 @@
++<?xml version="1.0" encoding="utf-8"?>
++<selector xmlns:android="http://schemas.android.com/apk/res/android">
++    <item android:drawable="@drawable/ic_star_filled" android:state_selected="true" />
++    <item android:drawable="@drawable/ic_star_outline" />
++</selector>
+Index: app/src/main/res/layout/fragment_artist.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/fragment_artist.xml b/app/src/main/res/layout/fragment_artist.xml
+--- a/app/src/main/res/layout/fragment_artist.xml	(revision 169a1d99d13d7cd3023fbe33529288f7a85b4c30)
++++ b/app/src/main/res/layout/fragment_artist.xml	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -1,6 +1,7 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:app="http://schemas.android.com/apk/res-auto"
++    xmlns:tools="http://schemas.android.com/tools"
+     android:id="@+id/swipeRefreshArtist"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent">
+@@ -8,8 +9,8 @@
+     <androidx.constraintlayout.widget.ConstraintLayout
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+-        android:background="@color/white_background"
+-        android:paddingTop="16dp">
++        android:layout_marginTop="16dp"
++        android:background="@color/white_background">
+ 
+         <!-- Lista de artistas -->
+         <androidx.recyclerview.widget.RecyclerView
+@@ -18,8 +19,10 @@
+             android:layout_height="0dp"
+             app:layout_constraintBottom_toBottomOf="parent"
+             app:layout_constraintEnd_toEndOf="parent"
++            app:layout_constraintHorizontal_bias="0.0"
+             app:layout_constraintStart_toStartOf="parent"
+-            app:layout_constraintTop_toTopOf="parent" />
++            app:layout_constraintTop_toTopOf="parent"
++            app:layout_constraintVertical_bias="0.0" />
+ 
+         <!-- Estado vacío / error -->
+         <LinearLayout
+@@ -36,8 +39,8 @@
+ 
+             <ImageView
+                 android:id="@+id/imageErrorArtist"
+-                android:layout_width="120dp"
+-                android:layout_height="120dp"
++                android:layout_width="wrap_content"
++                android:layout_height="250dp"
+                 android:src="@drawable/ic_no_connection" />
+ 
+             <TextView
+@@ -45,13 +48,14 @@
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_marginTop="8dp"
+-                android:text="Error al cargar artistas" />
++                android:text="Error al cargar artistas"
++                android:textSize="18sp" />
+ 
+             <com.google.android.material.button.MaterialButton
+                 android:id="@+id/buttonRetryArtist"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+-                android:layout_marginTop="12dp"
++                android:layout_marginTop="20dp"
+                 android:text="Reintentar" />
+         </LinearLayout>
+ 
+@@ -60,10 +64,26 @@
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_margin="16dp"
+-            android:contentDescription="Agregar artista"
+             android:src="@drawable/ic_add"
+             app:backgroundTint="@color/purple_500"
+             app:layout_constraintBottom_toBottomOf="parent"
+-            app:layout_constraintEnd_toEndOf="parent" />
++            app:layout_constraintEnd_toEndOf="parent"
++            tools:ignore="ContentDescription" />
++
++        <!-- FAB extra para filtrar favoritos -->
++        <com.google.android.material.floatingactionbutton.FloatingActionButton
++            android:id="@+id/fab_filter_favorites"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:layout_margin="16dp"
++            android:layout_marginEnd="32dp"
++            android:layout_marginBottom="60dp"
++            app:backgroundTint="@android:color/white"
++            app:layout_anchor="@id/recyclerViewArtists"
++            app:layout_anchorGravity="bottom|end"
++            app:layout_constraintBottom_toTopOf="@+id/fab_add_artist"
++            app:layout_constraintEnd_toEndOf="@+id/recyclerViewArtists"
++            app:srcCompat="@drawable/ic_star_filled"
++            app:tint="@color/gold" />
+     </androidx.constraintlayout.widget.ConstraintLayout>
+ </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+Index: app/src/main/res/layout/fragment_create_artist.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/fragment_create_artist.xml b/app/src/main/res/layout/fragment_create_artist.xml
+new file mode 100644
+--- /dev/null	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
++++ b/app/src/main/res/layout/fragment_create_artist.xml	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -0,0 +1,116 @@
++<?xml version="1.0" encoding="utf-8"?>
++<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto"
++    xmlns:tools="http://schemas.android.com/tools"
++    android:layout_width="match_parent"
++    android:layout_height="match_parent"
++    android:background="@color/white_background">
++
++    <!-- NestedScrollView para el contenido -->
++    <androidx.core.widget.NestedScrollView
++        android:id="@+id/scrollViewContent"
++        android:layout_width="0dp"
++        android:layout_height="0dp"
++        android:padding="16dp"
++        app:layout_constraintBottom_toTopOf="@id/btnCreateArtist"
++        app:layout_constraintEnd_toEndOf="parent"
++        app:layout_constraintStart_toStartOf="parent"
++        app:layout_constraintTop_toTopOf="parent">
++
++        <LinearLayout
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:orientation="vertical">
++
++            <com.google.android.material.textfield.TextInputLayout
++                android:id="@+id/tilName"
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:hint="Nombre">
++
++                <com.google.android.material.textfield.TextInputEditText
++                    android:id="@+id/etName"
++                    android:layout_width="match_parent"
++                    android:layout_height="wrap_content" />
++            </com.google.android.material.textfield.TextInputLayout>
++
++            <com.google.android.material.textfield.TextInputLayout
++                android:id="@+id/tilBirth"
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:layout_marginTop="12dp"
++                android:hint="Fecha de nacimiento">
++
++                <com.google.android.material.textfield.TextInputEditText
++                    android:id="@+id/etBirth"
++                    android:layout_width="match_parent"
++                    android:layout_height="wrap_content"
++                    android:focusable="false" />
++            </com.google.android.material.textfield.TextInputLayout>
++
++            <com.google.android.material.textfield.TextInputLayout
++                android:id="@+id/tilDesc"
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:layout_marginTop="12dp"
++                android:hint="Descripción">
++
++                <com.google.android.material.textfield.TextInputEditText
++                    android:id="@+id/etDesc"
++                    android:layout_width="match_parent"
++                    android:layout_height="wrap_content"
++                    android:lines="3" />
++            </com.google.android.material.textfield.TextInputLayout>
++
++            <LinearLayout
++                android:id="@+id/image_upload_container"
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:layout_marginTop="12dp"
++                android:background="@drawable/bg_dotted_border"
++                android:gravity="center"
++                android:orientation="vertical"
++                android:padding="8dp">
++
++                <ImageView
++                    android:id="@+id/image_preview"
++                    android:layout_width="64dp"
++                    android:layout_height="64dp"
++                    android:src="@drawable/ic_profile"
++                    tools:ignore="ContentDescription" />
++
++                <TextView
++                    android:layout_width="wrap_content"
++                    android:layout_height="wrap_content"
++                    android:layout_marginTop="8dp"
++                    android:text="Toca para subir foto de perfil"
++                    android:textColor="?attr/colorOnSurface" />
++
++                <TextView
++                    android:layout_width="wrap_content"
++                    android:layout_height="wrap_content"
++                    android:text="PNG, JPG hasta 5MB"
++                    android:textColor="?attr/colorOnSurface"
++                    android:textSize="12sp"
++                    android:visibility="gone" />
++            </LinearLayout>
++
++        </LinearLayout>
++    </androidx.core.widget.NestedScrollView>
++
++    <!-- Botón alineado a la parte inferior -->
++    <com.google.android.material.button.MaterialButton
++        android:id="@+id/btnCreateArtist"
++        style="@style/Widget.MaterialComponents.Button"
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:layout_marginHorizontal="26dp"
++        android:backgroundTint="?attr/colorPrimary"
++        android:padding="16dp"
++        android:text="Crear Artista"
++        android:textColor="@android:color/white"
++        app:layout_constraintBottom_toBottomOf="parent"
++        app:layout_constraintEnd_toEndOf="parent"
++        app:layout_constraintStart_toStartOf="parent" />
++
++</androidx.constraintlayout.widget.ConstraintLayout>
+Index: app/src/main/res/layout/fragment_artist_detail.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/fragment_artist_detail.xml b/app/src/main/res/layout/fragment_detail_artist.xml
+rename from app/src/main/res/layout/fragment_artist_detail.xml
+rename to app/src/main/res/layout/fragment_detail_artist.xml
+--- a/app/src/main/res/layout/fragment_artist_detail.xml	(revision 169a1d99d13d7cd3023fbe33529288f7a85b4c30)
++++ b/app/src/main/res/layout/fragment_detail_artist.xml	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -35,15 +35,24 @@
+                     android:layout_height="wrap_content">
+ 
+                     <!-- Imagen del artista -->
+-                    <ImageView
+-                        android:id="@+id/ivArtist"
++                    <com.facebook.shimmer.ShimmerFrameLayout
++                        android:id="@+id/shimmerArtist"
+                         android:layout_width="120dp"
+                         android:layout_height="120dp"
+-                        android:scaleType="centerCrop"
+                         app:layout_constraintBottom_toBottomOf="parent"
+                         app:layout_constraintStart_toStartOf="parent"
+                         app:layout_constraintTop_toTopOf="parent"
+-                        tools:srcCompat="@tools:sample/avatars" />
++                        app:shimmer_auto_start="true"
++                        app:shimmer_duration="1500">
++
++                        <ImageView
++                            android:id="@+id/ivArtist"
++                            android:layout_width="match_parent"
++                            android:layout_height="match_parent"
++                            android:scaleType="centerCrop"
++                            tools:ignore="ContentDescription"
++                            tools:srcCompat="@tools:sample/avatars" />
++                    </com.facebook.shimmer.ShimmerFrameLayout>
+ 
+                     <LinearLayout
+                         android:layout_width="0dp"
+@@ -52,10 +61,10 @@
+                         android:layout_marginEnd="16dp"
+                         android:gravity="center_vertical"
+                         android:orientation="vertical"
+-                        app:layout_constraintBottom_toBottomOf="@id/ivArtist"
++                        app:layout_constraintBottom_toBottomOf="@id/shimmerArtist"
+                         app:layout_constraintEnd_toEndOf="parent"
+-                        app:layout_constraintStart_toEndOf="@id/ivArtist"
+-                        app:layout_constraintTop_toTopOf="@id/ivArtist">
++                        app:layout_constraintStart_toEndOf="@id/shimmerArtist"
++                        app:layout_constraintTop_toTopOf="@id/shimmerArtist">
+ 
+                         <!-- Nombre -->
+                         <TextView
+@@ -208,6 +217,16 @@
+                 android:layout_marginBottom="16dp"
+                 android:orientation="horizontal" />
+ 
++            <TextView
++                android:id="@+id/textNoAlbums"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:layout_gravity="center"
++                android:layout_marginVertical="24dp"
++                android:text="No hay álbumes disponibles"
++                android:textSize="16sp"
++                android:visibility="gone" />
++
+             <!-- Sección de Premios -->
+             <TextView
+                 android:layout_width="match_parent"
+@@ -224,6 +243,16 @@
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content" />
+ 
++            <TextView
++                android:id="@+id/textNoPrizes"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:layout_gravity="center"
++                android:layout_marginVertical="24dp"
++                android:text="No hay premios asignados"
++                android:textSize="16sp"
++                android:visibility="gone" />
++
+         </LinearLayout>
+ 
+         <!-- ProgressBar -->
+Index: app/src/main/res/layout/item_artist.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/item_artist.xml b/app/src/main/res/layout/item_artist.xml
+--- a/app/src/main/res/layout/item_artist.xml	(revision 169a1d99d13d7cd3023fbe33529288f7a85b4c30)
++++ b/app/src/main/res/layout/item_artist.xml	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -8,12 +8,11 @@
+     app:cardCornerRadius="12dp"
+     app:cardElevation="4dp">
+ 
+-    <LinearLayout
++    <RelativeLayout
+         android:layout_width="match_parent"
+-        android:layout_height="wrap_content"
+-        android:orientation="vertical"
+-        android:padding="8dp">
++        android:layout_height="wrap_content">
+ 
++        <!-- Artist Image -->
+         <com.facebook.shimmer.ShimmerFrameLayout
+             android:id="@+id/shimmerImageViewArtistCover"
+             android:layout_width="match_parent"
+@@ -29,22 +28,51 @@
+                 tools:ignore="ContentDescription" />
+         </com.facebook.shimmer.ShimmerFrameLayout>
+ 
+-        <TextView
+-            android:id="@+id/textViewArtistName"
+-            android:layout_width="match_parent"
+-            android:layout_height="wrap_content"
+-            android:layout_marginTop="4dp"
+-            android:textStyle="bold"
+-            tools:text="Artist Name" />
++        <!-- Favorite Button -->
++        <FrameLayout
++            android:layout_width="40dp"
++            android:layout_height="40dp"
++            android:layout_alignTop="@id/shimmerImageViewArtistCover"
++            android:layout_alignEnd="@id/shimmerImageViewArtistCover"
++            android:layout_margin="4dp"
++            android:background="@drawable/bg_circle_transparent">
++
++            <ImageButton
++                android:id="@+id/btnFavorite"
++                android:layout_width="match_parent"
++                android:layout_height="match_parent"
++                android:background="?attr/selectableItemBackgroundBorderless"
++                android:src="@drawable/selector_favorite"
++                android:stateListAnimator="@android:anim/overshoot_interpolator"
++                tools:ignore="ContentDescription" />
++        </FrameLayout>
++
++        <!-- Artist Details -->
++        <LinearLayout
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:layout_below="@id/shimmerImageViewArtistCover"
++            android:orientation="vertical"
++            android:padding="8dp">
++
++            <TextView
++                android:id="@+id/textViewArtistName"
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:layout_marginTop="4dp"
++                android:textStyle="bold"
++                tools:text="Artist Name" />
+ 
+-        <TextView
+-            android:id="@+id/textViewArtistBio"
+-            android:layout_width="match_parent"
+-            android:layout_height="wrap_content"
+-            android:layout_marginTop="4dp"
+-            android:ellipsize="end"
+-            android:maxLines="2"
+-            android:textSize="14sp"
+-            tools:text="Artist Bio" />
+-    </LinearLayout>
++            <TextView
++                android:id="@+id/textViewArtistBio"
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:layout_marginTop="4dp"
++                android:ellipsize="end"
++                android:maxLines="2"
++                android:textSize="14sp"
++                tools:text="Artist Bio" />
++        </LinearLayout>
++
++    </RelativeLayout>
+ </androidx.cardview.widget.CardView>
+Index: app/src/main/res/navigation/nav_graph.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/navigation/nav_graph.xml b/app/src/main/res/navigation/nav_graph.xml
+--- a/app/src/main/res/navigation/nav_graph.xml	(revision 169a1d99d13d7cd3023fbe33529288f7a85b4c30)
++++ b/app/src/main/res/navigation/nav_graph.xml	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -1,6 +1,7 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <navigation xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:app="http://schemas.android.com/apk/res-auto"
++    xmlns:tools="http://schemas.android.com/tools"
+     android:id="@+id/nav_graph"
+     app:startDestination="@id/homeFragment">
+ 
+@@ -34,16 +35,24 @@
+         <action
+             android:id="@+id/action_artistFragment_to_artistDetailFragment"
+             app:destination="@id/artistDetailFragment" />
++        <action
++            android:id="@+id/action_artist_to_createArtist"
++            app:destination="@id/createArtistFragment" />
+     </fragment>
+ 
+     <fragment
+         android:id="@+id/artistDetailFragment"
+-        android:name="com.example.vinilosmobileapp.ui.artist.ArtistDetailFragment"
++        android:name="com.example.vinilosmobileapp.ui.artist.DetailArtistFragment"
+         android:label="Detalle Artista">
+         <argument
+             android:name="artistId"
+             app:argType="integer" />
+     </fragment>
++    <fragment
++        android:id="@+id/createArtistFragment"
++        android:name="com.example.vinilosmobileapp.ui.artist.CreateArtistFragment"
++        android:label="Crear Artista"
++        tools:layout="@layout/fragment_create_artist" />
+ 
+     <fragment
+         android:id="@+id/favoritesFragment"
+Index: app/src/main/res/values/colors.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/values/colors.xml b/app/src/main/res/values/colors.xml
+--- a/app/src/main/res/values/colors.xml	(revision 169a1d99d13d7cd3023fbe33529288f7a85b4c30)
++++ b/app/src/main/res/values/colors.xml	(revision 02dd538d09d06c804ab2f55e9ed0987bf2817fdd)
+@@ -8,4 +8,8 @@
+     <color name="black">#FF000000</color>
+     <color name="white">#FFFFFFFF</color>
+     <color name="white_background">#F8F8F8</color>
++    <color name="gold">#FFD700</color>
++    <color name="gray_transparent">#CCFFFFFF</color>
++    <color name="darker_gray_transparent">#AAC0C0C0</color>
++    <color name="colorPrimary">#6200EE</color>
+ </resources>

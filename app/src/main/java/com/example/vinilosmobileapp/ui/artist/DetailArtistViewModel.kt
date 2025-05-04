@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.example.vinilosmobileapp.model.ArtistDetail
 import com.example.vinilosmobileapp.repository.ArtistRepository
 
-class ArtistDetailViewModel : ViewModel() {
+class DetailArtistViewModel : ViewModel() {
     private val repo = ArtistRepository()
 
     private val _artist = MutableLiveData<ArtistDetail?>()
