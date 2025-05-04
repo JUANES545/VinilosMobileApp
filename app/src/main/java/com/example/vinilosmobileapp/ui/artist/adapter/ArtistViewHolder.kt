@@ -5,6 +5,7 @@ import coil.load
 import com.example.vinilosmobileapp.R
 import com.example.vinilosmobileapp.databinding.ItemArtistBinding
 import com.example.vinilosmobileapp.model.Artist
+import com.example.vinilosmobileapp.utils.FavoritesManager
 
 class ArtistViewHolder(private val binding: ItemArtistBinding) :
     RecyclerView.ViewHolder(binding.root) {
@@ -25,5 +26,16 @@ class ArtistViewHolder(private val binding: ItemArtistBinding) :
             )
         }
 
+        setupFavorites(artist)
     }
+
+    private fun setupFavorites(artist: Artist) {
+        val isFavorite = FavoritesManager.isFavorite(binding.root.context, artist.id)
+        binding.btnFavorite.isSelected = isFavorite
+        binding.btnFavorite.setOnClickListener {
+            FavoritesManager.toggleFavorite(binding.root.context, artist.id)
+            binding.btnFavorite.isSelected = !binding.btnFavorite.isSelected
+        }
+    }
+
 }

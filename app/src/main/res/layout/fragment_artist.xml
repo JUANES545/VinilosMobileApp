@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swipeRefreshArtist"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -8,8 +9,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white_background"
-        android:paddingTop="16dp">
+        android:layout_marginTop="16dp"
+        android:background="@color/white_background">
 
         <!-- Lista de artistas -->
         <androidx.recyclerview.widget.RecyclerView
@@ -18,8 +19,10 @@
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
 
         <!-- Estado vacío / error -->
         <LinearLayout
@@ -36,8 +39,8 @@
 
             <ImageView
                 android:id="@+id/imageErrorArtist"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="wrap_content"
+                android:layout_height="250dp"
                 android:src="@drawable/ic_no_connection" />
 
             <TextView
@@ -45,13 +48,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Error al cargar artistas" />
+                android:text="Error al cargar artistas"
+                android:textSize="18sp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonRetryArtist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="20dp"
                 android:text="Reintentar" />
         </LinearLayout>
 
@@ -60,10 +64,26 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:contentDescription="Agregar artista"
             android:src="@drawable/ic_add"
             app:backgroundTint="@color/purple_500"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="ContentDescription" />
+
+        <!-- FAB extra para filtrar favoritos -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_filter_favorites"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="60dp"
+            app:backgroundTint="@android:color/white"
+            app:layout_anchor="@id/recyclerViewArtists"
+            app:layout_anchorGravity="bottom|end"
+            app:layout_constraintBottom_toTopOf="@+id/fab_add_artist"
+            app:layout_constraintEnd_toEndOf="@+id/recyclerViewArtists"
+            app:srcCompat="@drawable/ic_star_filled"
+            app:tint="@color/gold" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
