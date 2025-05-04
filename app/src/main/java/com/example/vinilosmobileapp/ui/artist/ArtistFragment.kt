@@ -6,8 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.vinilosmobileapp.R
 import com.example.vinilosmobileapp.databinding.FragmentArtistBinding
 import com.example.vinilosmobileapp.ui.artist.adapter.ArtistAdapter
 
@@ -35,7 +36,13 @@ class ArtistFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        artistAdapter = ArtistAdapter(emptyList())
+        artistAdapter = ArtistAdapter(emptyList()) { artistId ->
+            val args = Bundle().apply { putInt("artistId", artistId) }
+            findNavController().navigate(
+                R.id.action_artistFragment_to_artistDetailFragment,
+                args
+            )
+        }
         binding.recyclerViewArtists.apply {
             layoutManager = GridLayoutManager(context, 2)
             adapter = artistAdapter

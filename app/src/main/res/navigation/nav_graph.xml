@@ -8,9 +8,9 @@
         android:id="@+id/homeFragment"
         android:name="com.example.vinilosmobileapp.ui.home.HomeFragment"
         android:label="Home">
-    <action
-        android:id="@+id/action_homeFragment_to_createAlbumFragment"
-        app:destination="@id/createAlbumFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_createAlbumFragment"
+            app:destination="@id/createAlbumFragment" />
     </fragment>
 
     <fragment
@@ -30,7 +30,20 @@
     <fragment
         android:id="@+id/artistFragment"
         android:name="com.example.vinilosmobileapp.ui.artist.ArtistFragment"
-        android:label="Artistas" />
+        android:label="Artistas">
+        <action
+            android:id="@+id/action_artistFragment_to_artistDetailFragment"
+            app:destination="@id/artistDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/artistDetailFragment"
+        android:name="com.example.vinilosmobileapp.ui.artist.ArtistDetailFragment"
+        android:label="Detalle Artista">
+        <argument
+            android:name="artistId"
+            app:argType="integer" />
+    </fragment>
 
     <fragment
         android:id="@+id/favoritesFragment"

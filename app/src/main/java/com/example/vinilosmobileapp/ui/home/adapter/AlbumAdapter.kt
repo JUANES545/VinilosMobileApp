@@ -25,11 +25,9 @@ class AlbumAdapter(
                 error(R.drawable.ic_failed_to_load_image)
                 listener(
                     onSuccess = { _, _ ->
-                        // Detener Shimmer al cargar la imagen correctamente
                         binding.shimmerImageViewAlbumCover.hideShimmer()
                     },
                     onError = { _, _ ->
-                        // También detener shimmer si falla
                         binding.shimmerImageViewAlbumCover.hideShimmer()
                     }
                 )
