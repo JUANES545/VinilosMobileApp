@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/homeFragment">
 
@@ -8,9 +9,9 @@
         android:id="@+id/homeFragment"
         android:name="com.example.vinilosmobileapp.ui.home.HomeFragment"
         android:label="Home">
-    <action
-        android:id="@+id/action_homeFragment_to_createAlbumFragment"
-        app:destination="@id/createAlbumFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_createAlbumFragment"
+            app:destination="@id/createAlbumFragment" />
     </fragment>
 
     <fragment
@@ -30,7 +31,28 @@
     <fragment
         android:id="@+id/artistFragment"
         android:name="com.example.vinilosmobileapp.ui.artist.ArtistFragment"
-        android:label="Artistas" />
+        android:label="Artistas">
+        <action
+            android:id="@+id/action_artistFragment_to_artistDetailFragment"
+            app:destination="@id/artistDetailFragment" />
+        <action
+            android:id="@+id/action_artist_to_createArtist"
+            app:destination="@id/createArtistFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/artistDetailFragment"
+        android:name="com.example.vinilosmobileapp.ui.artist.DetailArtistFragment"
+        android:label="Detalle Artista">
+        <argument
+            android:name="artistId"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/createArtistFragment"
+        android:name="com.example.vinilosmobileapp.ui.artist.CreateArtistFragment"
+        android:label="Crear Artista"
+        tools:layout="@layout/fragment_create_artist" />
 
     <fragment
         android:id="@+id/favoritesFragment"

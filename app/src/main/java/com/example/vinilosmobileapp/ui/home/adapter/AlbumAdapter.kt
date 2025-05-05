@@ -9,8 +9,8 @@ import com.example.vinilosmobileapp.databinding.ItemAlbumBinding
 import com.example.vinilosmobileapp.model.Album
 
 class AlbumAdapter(
-    private var albumList: List<Album>,
-    private val onClick: (Int) -> Unit
+    var albumList: List<Album>,
+    val onClick: (Int) -> Unit
 ) : RecyclerView.Adapter<AlbumAdapter.AlbumViewHolder>() {
 
     inner class AlbumViewHolder(private val binding: ItemAlbumBinding) :
@@ -25,11 +25,9 @@ class AlbumAdapter(
                 error(R.drawable.ic_failed_to_load_image)
                 listener(
                     onSuccess = { _, _ ->
-                        // Detener Shimmer al cargar la imagen correctamente
                         binding.shimmerImageViewAlbumCover.hideShimmer()
                     },
                     onError = { _, _ ->
-                        // También detener shimmer si falla
                         binding.shimmerImageViewAlbumCover.hideShimmer()
                     }
                 )

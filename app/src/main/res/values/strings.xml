@@ -13,6 +13,8 @@
 
 
     <!-- Artist screen -->
+    <string name="create_new_artist">Crear Nuevo Artista</string>
+    <string name="detail_artist">Detalles del Artista</string>
 
 
     <!-- Favorites screen -->
