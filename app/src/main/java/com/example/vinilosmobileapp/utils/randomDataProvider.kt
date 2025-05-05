@@ -34,12 +34,36 @@ object RandomDataProvider {
 
     val genreOptions = listOf("Classical", "Salsa", "Rock", "Folk")
 
-    val artistOptions = listOf(
+    val recordLabels = listOf(
         "Sony Music",
         "EMI",
         "Discos Fuentes",
         "Elektra",
         "Fania Records"
+    )
+
+    val organizations = listOf(
+        "Music Awards",
+        "Global Music",
+        "World Sound",
+        "International Music Fest",
+        "Harmony Awards"
+    )
+
+    val awardNames = listOf(
+        "Best New Artist",
+        "Album of the Year",
+        "Song of the Year",
+        "Best Live Performance",
+        "Lifetime Achievement"
+    )
+
+    val descriptions = listOf(
+        "Awarded to the best new artist of the year.",
+        "Awarded to the best album of the year.",
+        "Awarded to the top song of the year.",
+        "Awarded to the artist with the best live performance of the year.",
+        "Awarded to an artist for their outstanding contributions to the music industry."
     )
 
     val artistName = listOf(

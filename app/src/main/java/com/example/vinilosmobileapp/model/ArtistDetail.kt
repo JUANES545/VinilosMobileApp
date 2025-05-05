@@ -16,3 +16,10 @@ data class PerformerPrize(
     val organization: String,
     val awardedDate: String
 )
+
+data class Prize(
+    val id: Int,
+    val organization: String,
+    val name: String,
+    val description: String
+)

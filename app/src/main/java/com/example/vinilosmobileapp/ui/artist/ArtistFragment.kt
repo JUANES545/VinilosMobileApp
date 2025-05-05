@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
@@ -12,9 +13,18 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.vinilosmobileapp.R
 import com.example.vinilosmobileapp.databinding.FragmentArtistBinding
+import com.example.vinilosmobileapp.datasource.remote.ArtistServiceAdapter
 import com.example.vinilosmobileapp.model.Artist
+import com.example.vinilosmobileapp.model.Prize
+import com.example.vinilosmobileapp.model.dto.PrizeCreateDTO
 import com.example.vinilosmobileapp.ui.artist.adapter.ArtistAdapter
 import com.example.vinilosmobileapp.utils.FavoritesManager
+import com.example.vinilosmobileapp.utils.RandomDataProvider.awardNames
+import com.example.vinilosmobileapp.utils.RandomDataProvider.descriptions
+import com.example.vinilosmobileapp.utils.RandomDataProvider.organizations
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class ArtistFragment : Fragment() {
 
@@ -35,6 +45,7 @@ class ArtistFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        ensurePrizesSeeded()
         setupRecyclerView()
         setupFabListeners()
         setupSwipeRefresh()
@@ -42,6 +53,59 @@ class ArtistFragment : Fragment() {
         observeViewModel()
 
         setupFabListeners()
+    }
+
+    private fun ensurePrizesSeeded() {
+        ArtistServiceAdapter.getPrizes().enqueue(object : Callback<List<Prize>> {
+            override fun onResponse(call: Call<List<Prize>>, response: Response<List<Prize>>) {
+                if (response.isSuccessful && response.body().isNullOrEmpty()) {
+                    seedPrizes()
+                }
+            }
+
+            override fun onFailure(call: Call<List<Prize>>, t: Throwable) {
+                seedPrizes()
+            }
+        })
+    }
+
+    private fun seedPrizes() {
+        organizations.forEach { label ->
+            // elegimos aleatoriamente organization / name / description
+            val dto = PrizeCreateDTO(
+                organization = organizations.random(),
+                name = awardNames.random() + " – $label",
+                description = descriptions.random()
+            )
+            ArtistServiceAdapter.createPrize(dto)
+                .enqueue(object : Callback<Prize> {
+                    override fun onResponse(call: Call<Prize>, rsp: Response<Prize>) {
+                        if (rsp.isSuccessful) {
+                            Toast.makeText(
+                                requireContext(),
+                                "⚙️ Prize creado: ${rsp.body()?.id}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            Toast.makeText(
+                                requireContext(),
+                                "❌ Error creando prize: ${rsp.code()} – ${
+                                    rsp.errorBody()?.string()
+                                }",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<Prize>, t: Throwable) {
+                        Toast.makeText(
+                            requireContext(),
+                            "❌ Red al crear prize: ${t.localizedMessage}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                })
+        }
     }
 
     private fun setupRecyclerView() {
