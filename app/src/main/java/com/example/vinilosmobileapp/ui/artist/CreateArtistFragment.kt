@@ -1,21 +1,36 @@
 package com.example.vinilosmobileapp.ui.artist
 
 import android.app.DatePickerDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import com.example.vinilosmobileapp.R
 import com.example.vinilosmobileapp.databinding.FragmentCreateArtistBinding
+import com.example.vinilosmobileapp.datasource.remote.AlbumServiceAdapter
+import com.example.vinilosmobileapp.datasource.remote.ArtistServiceAdapter
+import com.example.vinilosmobileapp.model.Album
+import com.example.vinilosmobileapp.model.Prize
 import com.example.vinilosmobileapp.model.dto.ArtistCreateDTO
+import com.example.vinilosmobileapp.ui.artist.adapter.PrizeInputAdapter
+import com.example.vinilosmobileapp.ui.home.adapter.AlbumAdapter
 import com.example.vinilosmobileapp.utils.RandomDataProvider
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.MaterialAutoCompleteTextView
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,6 +43,9 @@ class CreateArtistFragment : Fragment() {
     private val sdf = SimpleDateFormat("yyyy-MM-dd'T'00:00:00.000'Z'", Locale.getDefault())
     private var selectedPhotoUrl: String? = null
 
+    private lateinit var albumAdapter: AlbumAdapter
+    private lateinit var prizeAdapter: PrizeInputAdapter
+
     override fun onCreateView(i: LayoutInflater, c: ViewGroup?, s: Bundle?) =
         FragmentCreateArtistBinding.inflate(i, c, false).also { _binding = it }.root
 
@@ -37,8 +55,12 @@ class CreateArtistFragment : Fragment() {
         setupArtistName()
         setupBirthDateCalendar()
         setupDescription()
+        setupAdapters()
 
         binding.imageUploadContainer.setOnClickListener { loadRandomProfilePhoto() }
+
+        binding.buttonAddAlbum.setOnClickListener { showAddAlbumDialog() }
+        binding.buttonAddPrize.setOnClickListener { showAddPrizeDialog() }
 
         binding.btnCreateArtist.setOnClickListener {
             var valid = true
@@ -78,6 +100,145 @@ class CreateArtistFragment : Fragment() {
         }
     }
 
+    private fun setupAdapters() {
+        // Reutilizamos el AlbumAdapter de la carpeta home
+        albumAdapter = AlbumAdapter(emptyList()) { albumId ->
+            Toast.makeText(requireContext(), "Álbum seleccionado: $albumId", Toast.LENGTH_SHORT)
+                .show()
+        }
+
+        binding.recyclerViewAlbums.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            adapter = albumAdapter
+        }
+
+        prizeAdapter = PrizeInputAdapter(mutableListOf())
+        binding.recyclerViewPrizes.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            adapter = prizeAdapter
+        }
+    }
+
+    private fun showAddAlbumDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_album, null)
+        val dropdownAlbum =
+            dialogView.findViewById<MaterialAutoCompleteTextView>(R.id.dropdown_album)
+        val guestHint = dialogView.findViewById<TextView>(R.id.guest_hint)
+
+        val builder = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Selecciona un álbum")
+            .setView(dialogView)
+            .setPositiveButton("Agregar", null)
+            .setNegativeButton("Cancelar", null)
+
+        val dialog = builder.create()
+        dialog.show()
+
+        AlbumServiceAdapter.getAlbums().enqueue(object : Callback<List<Album>> {
+            override fun onResponse(call: Call<List<Album>>, resp: Response<List<Album>>) {
+                val list = resp.body().orEmpty()
+                val filteredList = list.filter { album ->
+                    albumAdapter.albumList.none { it.id == album.id }
+                }
+                if (filteredList.isEmpty()) {
+                    guestHint.visibility = View.VISIBLE
+                    dialog.getButton(DialogInterface.BUTTON_POSITIVE).isEnabled = false
+                } else {
+                    guestHint.visibility = View.GONE
+                    val names = filteredList.map { it.name }
+                    val adapter = ArrayAdapter(
+                        requireContext(),
+                        android.R.layout.simple_dropdown_item_1line,
+                        names
+                    )
+                    dropdownAlbum.setAdapter(adapter)
+                    dialog.getButton(DialogInterface.BUTTON_POSITIVE).isEnabled = true
+
+                    dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
+                        val selected = dropdownAlbum.text.toString()
+                        val index = names.indexOf(selected)
+                        if (index >= 0) {
+                            // Añadimos el álbum al adaptador y actualizamos la lista
+                            val selectedAlbum = filteredList[index]
+                            val updatedList = albumAdapter.albumList.toMutableList().apply {
+                                add(selectedAlbum)
+                            }
+                            albumAdapter.updateAlbums(updatedList)
+                            dialog.dismiss()
+                        }
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<List<Album>>, t: Throwable) {
+                Toast.makeText(context, "Error cargando álbumes", Toast.LENGTH_SHORT).show()
+                guestHint.text = "No se pudieron cargar los álbumes."
+                guestHint.visibility = View.VISIBLE
+                dialog.getButton(DialogInterface.BUTTON_POSITIVE).isEnabled = false
+            }
+        })
+    }
+
+
+    private fun showAddPrizeDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_prize, null)
+        val prizeDropdown =
+            dialogView.findViewById<com.google.android.material.textfield.MaterialAutoCompleteTextView>(
+                R.id.dropdownPrize
+            )
+        val inputDate =
+            dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.inputPrizeDate)
+                .apply {
+                    val randomCalendar = Calendar.getInstance().apply {
+                        set((1950..2023).random(), (0..11).random(), (1..28).random())
+                    }
+                    setText(
+                        SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(
+                            randomCalendar.time
+                        )
+                    )
+                }
+
+        // Pre-cargar lista de premios
+        ArtistServiceAdapter.getPrizes().enqueue(object : retrofit2.Callback<List<Prize>> {
+            override fun onResponse(
+                call: retrofit2.Call<List<Prize>>,
+                resp: retrofit2.Response<List<Prize>>
+            ) {
+                val list = resp.body().orEmpty()
+                val names =
+                    if (list.isNotEmpty()) list.map { it.name } else listOf("No hay premios disponibles")
+                prizeDropdown.setAdapter(
+                    ArrayAdapter(
+                        requireContext(),
+                        android.R.layout.simple_dropdown_item_1line,
+                        names
+                    )
+                )
+            }
+
+            override fun onFailure(call: retrofit2.Call<List<Prize>>, t: Throwable) {
+                Toast.makeText(
+                    context,
+                    "No se pudieron obtener datos del servidor",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        })
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Agregar Premio")
+            .setView(dialogView)
+            .setPositiveButton("Agregar") { _, _ ->
+                val prizeName = prizeDropdown.text.toString()
+                val date = inputDate.text.toString().trim().ifEmpty { null }
+                prizeAdapter.addPrize(prizeName, date)
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+
     private fun setupArtistName() {
         var isFirstClick = true
         binding.etName.setOnClickListener {
@@ -90,7 +251,6 @@ class CreateArtistFragment : Fragment() {
     }
 
     private fun setupBirthDateCalendar() {
-        // Generar una fecha aleatoria entre 1955 y 2006
         val randomYear = (1955..2006).random()
         val randomMonth = (0..11).random()
         val randomDay = (1..cal.getActualMaximum(Calendar.DAY_OF_MONTH)).random()

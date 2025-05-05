@@ -2,7 +2,9 @@ package com.example.vinilosmobileapp.datasource.remote
 
 import com.example.vinilosmobileapp.model.Artist
 import com.example.vinilosmobileapp.model.ArtistDetail
+import com.example.vinilosmobileapp.model.Prize
 import com.example.vinilosmobileapp.model.dto.ArtistCreateDTO
+import com.example.vinilosmobileapp.model.dto.PrizeCreateDTO
 import retrofit2.Call
 
 object ArtistServiceAdapter {
@@ -15,4 +17,8 @@ object ArtistServiceAdapter {
 
     fun createArtist(dto: ArtistCreateDTO): Call<Artist> =
         service.createMusician(dto)
+
+    fun getPrizes(): Call<List<Prize>> = service.getPrizes()
+
+    fun createPrize(dto: PrizeCreateDTO): Call<Prize> = service.createPrize(dto)
 }

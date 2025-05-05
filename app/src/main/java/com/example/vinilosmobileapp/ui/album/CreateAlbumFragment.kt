@@ -50,7 +50,7 @@ class CreateAlbumFragment : Fragment() {
     private lateinit var trackInputAdapter: TrackInputAdapter
 
     private val genreOptions = RandomDataProvider.genreOptions
-    private val artistOptions = RandomDataProvider.artistOptions
+    private val artistOptions = RandomDataProvider.recordLabels
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

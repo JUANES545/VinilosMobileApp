@@ -6,3 +6,9 @@ data class ArtistCreateDTO(
     val description: String,
     val birthDate: String
 )
+
+data class PrizeCreateDTO(
+    val organization: String,
+    val name: String,
+    val description: String
+)
