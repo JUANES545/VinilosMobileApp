@@ -3,7 +3,7 @@
 Este proyecto tiene como objetivo desarrollar una aplicación móvil para navegar y gestionar catálogos de vinilos basada en la versión web existente.
 
 ## 🍷 APK
-A continuación proporcionamos el siguiente [APK](https://github.com/JUANES545/VinilosMobileApp/releases/download/2.0.0/VinilosMobileApp.apk) para la instalación de la aplicación.
+A continuación proporcionamos el siguiente [APK](https://github.com/JUANES545/VinilosMobileApp/releases/download/3.0/VinilosMobileApp.apk) para la instalación de la aplicación.
 
 ## 🛠️ Instrucciones para construir la aplicación localmente
 
