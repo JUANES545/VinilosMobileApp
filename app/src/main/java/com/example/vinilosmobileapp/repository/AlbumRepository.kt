@@ -22,12 +22,12 @@ class AlbumRepository {
                 if (response.isSuccessful && response.body() != null) {
                     onSuccess(response.body()!!)
                 } else {
-                    onError("Código: ${response.code()}")
+                    onError("Error: ${response.code()}")
                 }
             }
 
             override fun onFailure(call: Call<List<Album>>, t: Throwable) {
-                onError("No se pudo conectar al servidor. Verifica tu conexión a Internet.")
+                onError("No se pudo conectar al servidor. Verifica tu conexión.")
             }
         })
     }

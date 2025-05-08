@@ -8,13 +8,22 @@
     <string name="title_profile">Perfil</string>
 
     <!-- Album screen -->
-    <string name="create_new_album">Crear Nuevo Álbum</string>
-    <string name="detail_album">Detalles del Álbum</string>
+    <string name="album_create_new">Crear Nuevo Álbum</string>
+    <string name="album_detail">Detalles del Álbum</string>
 
 
     <!-- Artist screen -->
-    <string name="create_new_artist">Crear Nuevo Artista</string>
-    <string name="detail_artist">Detalles del Artista</string>
+    <string name="artist_create_new">Crear Nuevo Artista</string>
+    <string name="artist_detail">Detalles del Artista</string>
+    <string name="artist_no_favorites">No tienes artistas favoritos :c</string>
+
+
+    <!-- Error Handler -->
+    <string name="error_connection">Error de conexión\n\n%1$s</string>
+    <string name="error_create_album">No hay álbumes disponibles\n\nCrea uno nuevo.</string>
+    <string name="error_create_artist">No hay artistas disponibles\n\nCrea uno nuevo.</string>
+    <string name="error_network_server">No se pudo conectar al servidor. Verifica tu conexión.</string>
+    <string name="error_retry">Reintentar</string>
 
 
     <!-- Favorites screen -->

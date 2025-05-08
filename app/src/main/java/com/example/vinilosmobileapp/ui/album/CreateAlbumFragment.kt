@@ -64,7 +64,7 @@ class CreateAlbumFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         (requireActivity() as AppCompatActivity).supportActionBar?.title =
-            getString(R.string.create_new_album)
+            getString(R.string.album_create_new)
 
         setupDropdowns()
         setupYearPicker()

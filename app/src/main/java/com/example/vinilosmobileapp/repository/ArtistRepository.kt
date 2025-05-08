@@ -29,7 +29,7 @@ class ArtistRepository {
             }
 
             override fun onFailure(call: Call<List<Artist>>, t: Throwable) {
-                onError(t.localizedMessage ?: "Error de red")
+                onError("No se pudo conectar al servidor. Verifica tu conexión.")
             }
         })
     }

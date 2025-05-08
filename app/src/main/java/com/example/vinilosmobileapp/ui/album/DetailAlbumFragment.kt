@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import com.example.vinilosmobileapp.R
 import com.example.vinilosmobileapp.databinding.FragmentDetailAlbumBinding
@@ -58,7 +57,7 @@ class DetailAlbumFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         (requireActivity() as AppCompatActivity).supportActionBar?.title =
-            getString(R.string.detail_album)
+            getString(R.string.album_detail)
 
         // Initialize the track adapter
         trackAdapter = TrackInputAdapter(emptyList())

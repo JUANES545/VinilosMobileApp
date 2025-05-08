@@ -155,10 +155,15 @@ class CreateArtistFragment : Fragment() {
                     dialog.getButton(DialogInterface.BUTTON_POSITIVE).isEnabled = true
 
                     dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
-                        val selected = dropdownAlbum.text.toString()
+                        val selected = dropdownAlbum.text.toString().trim()
+
+                        if (selected.isEmpty()) {
+                            dropdownAlbum.error = "Selecciona un álbum"
+                            return@setOnClickListener
+                        }
+
                         val index = names.indexOf(selected)
                         if (index >= 0) {
-                            // Añadimos el álbum al adaptador y actualizamos la lista
                             val selectedAlbum = filteredList[index]
                             val updatedList = albumAdapter.albumList.toMutableList().apply {
                                 add(selectedAlbum)
@@ -183,7 +188,7 @@ class CreateArtistFragment : Fragment() {
     private fun showAddPrizeDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_prize, null)
         val prizeDropdown =
-            dialogView.findViewById<com.google.android.material.textfield.MaterialAutoCompleteTextView>(
+            dialogView.findViewById<MaterialAutoCompleteTextView>(
                 R.id.dropdownPrize
             )
         val inputDate =
@@ -199,11 +204,20 @@ class CreateArtistFragment : Fragment() {
                     )
                 }
 
+        val builder = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Agregar Premio")
+            .setView(dialogView)
+            .setPositiveButton("Agregar", null)
+            .setNegativeButton("Cancelar", null)
+
+        val dialog = builder.create()
+        dialog.show()
+
         // Pre-cargar lista de premios
-        ArtistServiceAdapter.getPrizes().enqueue(object : retrofit2.Callback<List<Prize>> {
+        ArtistServiceAdapter.getPrizes().enqueue(object : Callback<List<Prize>> {
             override fun onResponse(
-                call: retrofit2.Call<List<Prize>>,
-                resp: retrofit2.Response<List<Prize>>
+                call: Call<List<Prize>>,
+                resp: Response<List<Prize>>
             ) {
                 val list = resp.body().orEmpty()
                 val names =
@@ -226,16 +240,25 @@ class CreateArtistFragment : Fragment() {
             }
         })
 
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Agregar Premio")
-            .setView(dialogView)
-            .setPositiveButton("Agregar") { _, _ ->
-                val prizeName = prizeDropdown.text.toString()
-                val date = inputDate.text.toString().trim().ifEmpty { null }
-                prizeAdapter.addPrize(prizeName, date)
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
+            val prizeName = prizeDropdown.text.toString().trim()
+            val date = inputDate.text.toString().trim()
+
+            var valid = true
+            if (prizeName.isEmpty()) {
+                prizeDropdown.error = "Selecciona un premio"
+                valid = false
             }
-            .setNegativeButton("Cancelar", null)
-            .show()
+            if (date.isEmpty()) {
+                inputDate.error = "Fecha requerida"
+                valid = false
+            }
+
+            if (!valid) return@setOnClickListener
+
+            prizeAdapter.addPrize(prizeName, date)
+            dialog.dismiss()
+        }
     }
 
 

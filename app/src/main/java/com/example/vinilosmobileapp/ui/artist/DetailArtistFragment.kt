@@ -36,7 +36,7 @@ class DetailArtistFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         (requireActivity() as AppCompatActivity).supportActionBar?.title =
-            getString(R.string.detail_artist)
+            getString(R.string.artist_detail)
         val artistId = arguments?.getInt("artistId") ?: -1
         if (artistId < 0) {
             Toast.makeText(requireContext(), "ID de artista inválido", Toast.LENGTH_SHORT).show()

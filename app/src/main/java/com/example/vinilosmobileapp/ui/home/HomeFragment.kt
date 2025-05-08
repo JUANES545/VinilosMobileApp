@@ -1,7 +1,6 @@
 package com.example.vinilosmobileapp.ui.home
 
 import android.os.Bundle
-import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.vinilosmobileapp.R
 import com.example.vinilosmobileapp.databinding.FragmentHomeBinding
 import com.example.vinilosmobileapp.ui.home.adapter.AlbumAdapter
+import com.example.vinilosmobileapp.utils.ErrorHandler
 
 class HomeFragment : Fragment() {
 
@@ -68,7 +68,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupRetryButton() {
-        binding.buttonRetry.setOnClickListener {
+        binding.errorLayout.buttonRetry.setOnClickListener {
             refreshAlbums()
         }
     }
@@ -81,9 +81,7 @@ class HomeFragment : Fragment() {
                 val sortedAlbums = albums.sortedByDescending { it.id }
 
                 binding.recyclerViewAlbums.visibility = View.VISIBLE
-                binding.textError.visibility = View.GONE
-                binding.imageError.visibility = View.GONE
-                binding.buttonRetry.visibility = View.GONE
+                binding.errorLayout.errorContainer.visibility = View.GONE
                 albumAdapter.updateAlbums(sortedAlbums)
             } else if (albums != null && albums.isEmpty()) {
                 showEmptyState()
@@ -94,37 +92,30 @@ class HomeFragment : Fragment() {
     private fun observeErrors() {
         viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             if (error != null) {
-                binding.swipeRefresh.isRefreshing = false
-                binding.recyclerViewAlbums.visibility = View.GONE
-
-                binding.textError.text = Html.fromHtml("<b>Error de conexión</b><br><br>$error")
-                binding.textError.visibility = View.VISIBLE
-
-                binding.imageError.setImageResource(R.drawable.ic_no_connection)
-                binding.imageError.visibility = View.VISIBLE
-
-                binding.buttonRetry.visibility = View.VISIBLE
+                ErrorHandler.showErrorState(
+                    binding.swipeRefresh,
+                    binding.recyclerViewAlbums,
+                    binding.errorLayout.errorContainer,
+                    errorMessage = getString(R.string.error_connection, error),
+                    errorIconRes = R.drawable.ic_no_connection
+                )
             }
         }
+    }
+
+    private fun showEmptyState() {
+        ErrorHandler.showEmptyState(
+            binding.swipeRefresh,
+            binding.recyclerViewAlbums,
+            binding.errorLayout.errorContainer,
+            emptyMessage = getString(R.string.error_create_album),
+            emptyIconRes = R.drawable.ic_empty_list
+        )
     }
 
     private fun refreshAlbums() {
         binding.swipeRefresh.isRefreshing = true
         viewModel.fetchAlbums()
-    }
-
-    private fun showEmptyState() {
-        binding.swipeRefresh.isRefreshing = false
-        binding.recyclerViewAlbums.visibility = View.GONE
-
-        binding.textError.text =
-            Html.fromHtml("No hay álbumes disponibles<br><br><b>Crea uno nuevo.</b>")
-        binding.textError.visibility = View.VISIBLE
-
-        binding.imageError.setImageResource(R.drawable.ic_empty_list)
-        binding.imageError.visibility = View.VISIBLE
-
-        binding.buttonRetry.visibility = View.GONE
     }
 
     override fun onDestroyView() {

@@ -24,40 +24,15 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0" />
 
-        <!-- Estado vacío / error -->
-        <LinearLayout
-            android:id="@+id/errorLayoutArtist"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:visibility="gone"
+        <include
+            android:id="@+id/errorLayout"
+            layout="@layout/layout_error_state"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:id="@+id/imageErrorArtist"
-                android:layout_width="wrap_content"
-                android:layout_height="250dp"
-                android:src="@drawable/ic_no_connection" />
-
-            <TextView
-                android:id="@+id/textErrorArtist"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Error al cargar artistas"
-                android:textSize="18sp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonRetryArtist"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Reintentar" />
-        </LinearLayout>
+            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="gone"
+            tools:visibility="visible"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_add_artist"
