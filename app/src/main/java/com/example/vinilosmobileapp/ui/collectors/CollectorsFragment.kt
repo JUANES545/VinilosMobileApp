@@ -1,22 +1,22 @@
-package com.example.vinilosmobileapp.ui.favorites
+package com.example.vinilosmobileapp.ui.collectors
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.vinilosmobileapp.databinding.FragmentFavoritesBinding
+import com.example.vinilosmobileapp.databinding.FragmentCollectorsBinding
 
-class FavoritesFragment : Fragment() {
+class CollectorsFragment : Fragment() {
 
-    private var _binding: FragmentFavoritesBinding? = null
+    private var _binding: FragmentCollectorsBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentFavoritesBinding.inflate(inflater, container, false)
+        _binding = FragmentCollectorsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
