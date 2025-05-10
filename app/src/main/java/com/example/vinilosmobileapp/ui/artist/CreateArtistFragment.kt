@@ -58,39 +58,23 @@ class CreateArtistFragment : Fragment() {
         setupAdapters()
 
         binding.imageUploadContainer.setOnClickListener { loadRandomProfilePhoto() }
-
         binding.buttonAddAlbum.setOnClickListener { showAddAlbumDialog() }
         binding.buttonAddPrize.setOnClickListener { showAddPrizeDialog() }
-
         binding.btnCreateArtist.setOnClickListener {
-            var valid = true
-            listOf(binding.tilName, binding.tilBirth, binding.tilDesc).forEach { it.error = null }
-
-            if (binding.etName.text.isNullOrBlank()) {
-                binding.tilName.error = "Nombre obligatorio"; valid = false
+            if (validateInputs()) {
+                val dto = ArtistCreateDTO(
+                    name = binding.etName.text.toString().trim(),
+                    image = selectedPhotoUrl ?: "https://http.cat/images/102.jpg",
+                    birthDate = sdf.format(cal.time),
+                    description = binding.etDesc.text.toString().trim()
+                )
+                vm.createArtist(dto)
             }
-            if (binding.etBirth.text.isNullOrBlank()) {
-                binding.tilBirth.error = "Fecha de nacimiento Requerida"; valid = false
-            }
-            if (binding.etDesc.text.isNullOrBlank()) {
-                binding.tilDesc.error = "Descripción Requerido"; valid = false
-            }
-            if (!valid) return@setOnClickListener
-
-            val dto = ArtistCreateDTO(
-                name = binding.etName.text.toString().trim(),
-                image = selectedPhotoUrl ?: "https://http.cat/images/102.jpg",
-                birthDate = sdf.format(cal.time),
-                description = binding.etDesc.text.toString().trim()
-            )
-
-            vm.createArtist(dto)
         }
 
-        vm.createResult.observe(viewLifecycleOwner) { ok ->
-            if (ok) {
+        vm.createResult.observe(viewLifecycleOwner) { success ->
+            if (success) {
                 Toast.makeText(requireContext(), "Artista creado", Toast.LENGTH_SHORT).show()
-                // avisamos para que el ArtistFragment refresque
                 setFragmentResult("artist_created", Bundle())
                 findNavController().popBackStack()
             } else {
@@ -98,6 +82,22 @@ class CreateArtistFragment : Fragment() {
                     .show()
             }
         }
+    }
+
+    private fun validateInputs(): Boolean {
+        var valid = true
+        listOf(binding.tilName, binding.tilBirth, binding.tilDesc).forEach { it.error = null }
+
+        if (binding.etName.text.isNullOrBlank()) {
+            binding.tilName.error = "Nombre obligatorio"; valid = false
+        }
+        if (binding.etBirth.text.isNullOrBlank()) {
+            binding.tilBirth.error = "Fecha de nacimiento requerida"; valid = false
+        }
+        if (binding.etDesc.text.isNullOrBlank()) {
+            binding.tilDesc.error = "Descripción requerida"; valid = false
+        }
+        return valid
     }
 
     private fun setupAdapters() {

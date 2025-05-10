@@ -13,7 +13,7 @@ class AlbumRepository {
 
     val createAlbumResult = MutableLiveData<Boolean>()
 
-    fun getAlbumsWithErrorHandler(
+    fun getAlbums(
         onSuccess: (List<Album>) -> Unit,
         onError: (String) -> Unit
     ) {

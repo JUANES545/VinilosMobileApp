@@ -21,7 +21,7 @@ class HomeViewModel : ViewModel() {
     }
 
     fun fetchAlbums() {
-        repository.getAlbumsWithErrorHandler(
+        repository.getAlbums(
             onSuccess = { fetchedAlbums ->
                 _albums.value = fetchedAlbums
                 _errorMessage.value = null

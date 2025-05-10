@@ -13,19 +13,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.vinilosmobileapp.R
 import com.example.vinilosmobileapp.databinding.FragmentArtistBinding
-import com.example.vinilosmobileapp.datasource.remote.ArtistServiceAdapter
 import com.example.vinilosmobileapp.model.Artist
-import com.example.vinilosmobileapp.model.Prize
-import com.example.vinilosmobileapp.model.dto.PrizeCreateDTO
 import com.example.vinilosmobileapp.ui.artist.adapter.ArtistAdapter
 import com.example.vinilosmobileapp.utils.ErrorHandler
 import com.example.vinilosmobileapp.utils.FavoritesManager
-import com.example.vinilosmobileapp.utils.RandomDataProvider.awardNames
-import com.example.vinilosmobileapp.utils.RandomDataProvider.descriptions
-import com.example.vinilosmobileapp.utils.RandomDataProvider.organizations
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class ArtistFragment : Fragment() {
 
@@ -57,46 +48,14 @@ class ArtistFragment : Fragment() {
     }
 
     private fun ensurePrizesSeeded() {
-        ArtistServiceAdapter.getPrizes().enqueue(object : Callback<List<Prize>> {
-            override fun onResponse(call: Call<List<Prize>>, response: Response<List<Prize>>) {
-                if (response.isSuccessful && response.body().isNullOrEmpty()) {
-                    seedPrizes()
-                }
+        viewModel.prizeSeedingResult.observe(viewLifecycleOwner) { success ->
+            if (success == true) {
+                Log.d("ArtistFragment", "Prizes seeded successfully.")
+            } else {
+                Log.e("ArtistFragment", "Failed to seed prizes.")
             }
-
-            override fun onFailure(call: Call<List<Prize>>, t: Throwable) {
-                seedPrizes()
-            }
-        })
-    }
-
-    private fun seedPrizes() {
-        organizations.forEach { label ->
-            // elegimos aleatoriamente organization / name / description
-            val dto = PrizeCreateDTO(
-                organization = organizations.random(),
-                name = awardNames.random() + " – $label",
-                description = descriptions.random()
-            )
-            ArtistServiceAdapter.createPrize(dto)
-                .enqueue(object : Callback<Prize> {
-                    override fun onResponse(call: Call<Prize>, rsp: Response<Prize>) {
-                        if (rsp.isSuccessful) {
-                            Log.d("ArtistFragment", "⚙️ Prize creado: ${rsp.body()?.id}")
-                        } else {
-                            Log.e(
-                                "ArtistFragment", "❌ Error creando prize: ${rsp.code()} – ${
-                                    rsp.errorBody()?.string()
-                                }"
-                            )
-                        }
-                    }
-
-                    override fun onFailure(call: Call<Prize>, t: Throwable) {
-                        Log.e("ArtistFragment", "❌ Red al crear prize: ${t.localizedMessage}")
-                    }
-                })
         }
+        viewModel.seedPrizes()
     }
 
     private fun setupRecyclerView() {

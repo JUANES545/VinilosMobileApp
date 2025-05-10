@@ -15,6 +15,9 @@ class ArtistViewModel : ViewModel() {
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> get() = _errorMessage
 
+    private val _prizeSeedingResult = MutableLiveData<Boolean>()
+    val prizeSeedingResult: LiveData<Boolean> get() = _prizeSeedingResult
+
     init {
         fetchArtists()
     }
@@ -31,4 +34,12 @@ class ArtistViewModel : ViewModel() {
             }
         )
     }
+
+    fun seedPrizes() {
+        repository.seedPrizes(
+            onSuccess = { _prizeSeedingResult.value = true },
+            onError = { _prizeSeedingResult.value = false }
+        )
+    }
+
 }
