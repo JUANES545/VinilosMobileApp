@@ -11,8 +11,8 @@ class PrizeInputAdapter(private var items: MutableList<Pair<String, String?>>) :
     inner class VH(val binding: ItemPrizeBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(prize: Pair<String, String?>) {
-            binding.tvPrizeName.text = prize.first
-            // binding.tvOrganization.text = prize.second ?: ""
+            binding.tvOrganization.text = prize.first.substringAfter("–", "").trim()
+            binding.tvPrizeName.text = prize.first.substringBefore("–", "").trim()
             binding.tvDateAwarded.text = prize.second ?: ""
         }
     }

@@ -115,4 +115,23 @@ class ArtistRepository {
         })
     }
 
+    fun getPrizes(
+        onSuccess: (List<Prize>) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        ArtistServiceAdapter.getPrizes().enqueue(object : Callback<List<Prize>> {
+            override fun onResponse(call: Call<List<Prize>>, response: Response<List<Prize>>) {
+                if (response.isSuccessful && response.body() != null) {
+                    onSuccess(response.body()!!)
+                } else {
+                    onError("Error: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<List<Prize>>, t: Throwable) {
+                onError("No se pudo conectar al servidor. Verifica tu conexión.")
+            }
+        })
+    }
+
 }

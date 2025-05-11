@@ -11,7 +11,6 @@
         android:id="@+id/scrollViewContent"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:padding="16dp"
         app:layout_constraintBottom_toTopOf="@id/btnCreateArtist"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,6 +25,7 @@
                 android:id="@+id/tilName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
                 android:hint="Nombre">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -38,6 +38,7 @@
                 android:id="@+id/tilBirth"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="12dp"
                 android:hint="Fecha de nacimiento">
 
@@ -52,6 +53,7 @@
                 android:id="@+id/tilDesc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="12dp"
                 android:hint="Descripción">
 
@@ -66,6 +68,7 @@
                 android:id="@+id/image_upload_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="12dp"
                 android:background="@drawable/bg_dotted_border"
                 android:gravity="center"
@@ -99,6 +102,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="24dp"
                 android:text="Lista de Álbumes"
                 android:textStyle="bold" />
@@ -113,8 +117,8 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_add_album"
                 android:layout_width="wrap_content"
-                android:layout_gravity="center"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_marginTop="8dp"
                 android:text="Agregar Álbum"
                 android:textAllCaps="false"
@@ -125,6 +129,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="24dp"
                 android:text="Lista de Premios"
                 android:textStyle="bold" />
