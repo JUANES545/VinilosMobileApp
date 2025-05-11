@@ -42,10 +42,10 @@ class DetailArtistFragment : Fragment() {
 
         val artistId = getArtistIdFromArguments() ?: return
 
-        setupMusicType()
         setupObservers()
-        setupRecyclerViews()
+        setupMusicType()
         fetchArtistDetails(artistId)
+        setupRecyclerViews()
     }
 
     private fun getArtistIdFromArguments(): Int? {
