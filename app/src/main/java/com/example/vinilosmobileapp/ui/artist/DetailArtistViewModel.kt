@@ -7,7 +7,7 @@ import com.example.vinilosmobileapp.model.ArtistDetail
 import com.example.vinilosmobileapp.repository.ArtistRepository
 
 class DetailArtistViewModel : ViewModel() {
-    private val repo = ArtistRepository()
+    private val artistRepository = ArtistRepository()
 
     private val _artist = MutableLiveData<ArtistDetail?>()
     val artist: LiveData<ArtistDetail?> = _artist
@@ -16,7 +16,7 @@ class DetailArtistViewModel : ViewModel() {
     val error: LiveData<String?> = _error
 
     fun fetchArtist(artistId: Int) {
-        repo.getArtistDetail(artistId,
+        artistRepository.getArtistDetail(artistId,
             onSuccess = {
                 _artist.value = it
                 _error.value = null
