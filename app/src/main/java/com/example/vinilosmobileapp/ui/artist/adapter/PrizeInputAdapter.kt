@@ -4,16 +4,22 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.vinilosmobileapp.databinding.ItemPrizeBinding
+import com.example.vinilosmobileapp.model.PerformerPrize
+import com.example.vinilosmobileapp.model.Prize
 
-class PrizeInputAdapter(private var items: MutableList<Pair<String, String?>>) :
-    RecyclerView.Adapter<PrizeInputAdapter.VH>() {
+class PrizeInputAdapter(
+    private var performerPrizes: MutableList<PerformerPrize>,
+    private var prizes: List<Prize>
+) : RecyclerView.Adapter<PrizeInputAdapter.VH>() {
 
     inner class VH(val binding: ItemPrizeBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(prize: Pair<String, String?>) {
-            binding.tvPrizeName.text = prize.first
-            // binding.tvOrganization.text = prize.second ?: ""
-            binding.tvDateAwarded.text = prize.second ?: ""
+        fun bind(performerPrize: PerformerPrize) {
+            // Find the corresponding Prize by matching IDs
+            val prize = prizes.find { it.id == performerPrize.id }
+            binding.tvOrganization.text = prize?.organization ?: "Organización desconocida"
+            binding.tvPrizeName.text = prize?.name ?: "Nombre desconocido"
+            binding.tvDateAwarded.text = performerPrize.premiationDate.take(10) // Format date
         }
     }
 
@@ -21,12 +27,22 @@ class PrizeInputAdapter(private var items: MutableList<Pair<String, String?>>) :
         ItemPrizeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
     )
 
-    override fun onBindViewHolder(holder: VH, position: Int) = holder.bind(items[position])
+    override fun onBindViewHolder(holder: VH, position: Int) =
+        holder.bind(performerPrizes[position])
 
-    override fun getItemCount() = items.size
+    override fun getItemCount() = performerPrizes.size
 
-    fun addPrize(name: String, date: String?) {
-        items.add(name to date)
-        notifyItemInserted(items.lastIndex)
+    fun addPrize(performerPrize: PerformerPrize) {
+        performerPrizes.add(performerPrize)
+        notifyItemInserted(performerPrizes.lastIndex)
+    }
+
+    fun updatePrizes(newPrizes: List<Prize>) {
+        prizes = newPrizes
+        notifyDataSetChanged()
+    }
+
+    fun getSelectedPrizes(): List<PerformerPrize> {
+        return performerPrizes
     }
 }

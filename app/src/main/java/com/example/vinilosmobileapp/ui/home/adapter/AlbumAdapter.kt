@@ -55,4 +55,8 @@ class AlbumAdapter(
         albumList = newAlbums
         notifyDataSetChanged()
     }
+
+    fun getSelectedAlbums(): List<Album> {
+        return albumList
+    }
 }

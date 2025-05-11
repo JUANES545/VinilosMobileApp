@@ -1,14 +1,11 @@
 package com.example.vinilosmobileapp.ui.artist
 
 import android.app.DatePickerDialog
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
@@ -18,19 +15,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import com.example.vinilosmobileapp.R
 import com.example.vinilosmobileapp.databinding.FragmentCreateArtistBinding
-import com.example.vinilosmobileapp.datasource.remote.AlbumServiceAdapter
-import com.example.vinilosmobileapp.datasource.remote.ArtistServiceAdapter
-import com.example.vinilosmobileapp.model.Album
-import com.example.vinilosmobileapp.model.Prize
+import com.example.vinilosmobileapp.model.PerformerPrize
 import com.example.vinilosmobileapp.model.dto.ArtistCreateDTO
 import com.example.vinilosmobileapp.ui.artist.adapter.PrizeInputAdapter
 import com.example.vinilosmobileapp.ui.home.adapter.AlbumAdapter
+import com.example.vinilosmobileapp.utils.DialogHelper
+import com.example.vinilosmobileapp.utils.DialogHelper.hideKeyboard
 import com.example.vinilosmobileapp.utils.RandomDataProvider
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.textfield.MaterialAutoCompleteTextView
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -44,7 +35,7 @@ class CreateArtistFragment : Fragment() {
     private var selectedPhotoUrl: String? = null
 
     private lateinit var albumAdapter: AlbumAdapter
-    private lateinit var prizeAdapter: PrizeInputAdapter
+    private lateinit var prizeInputAdapter: PrizeInputAdapter
 
     override fun onCreateView(i: LayoutInflater, c: ViewGroup?, s: Bundle?) =
         FragmentCreateArtistBinding.inflate(i, c, false).also { _binding = it }.root
@@ -56,41 +47,31 @@ class CreateArtistFragment : Fragment() {
         setupBirthDateCalendar()
         setupDescription()
         setupAdapters()
-
         binding.imageUploadContainer.setOnClickListener { loadRandomProfilePhoto() }
-
-        binding.buttonAddAlbum.setOnClickListener { showAddAlbumDialog() }
-        binding.buttonAddPrize.setOnClickListener { showAddPrizeDialog() }
-
-        binding.btnCreateArtist.setOnClickListener {
-            var valid = true
-            listOf(binding.tilName, binding.tilBirth, binding.tilDesc).forEach { it.error = null }
-
-            if (binding.etName.text.isNullOrBlank()) {
-                binding.tilName.error = "Nombre obligatorio"; valid = false
-            }
-            if (binding.etBirth.text.isNullOrBlank()) {
-                binding.tilBirth.error = "Fecha de nacimiento Requerida"; valid = false
-            }
-            if (binding.etDesc.text.isNullOrBlank()) {
-                binding.tilDesc.error = "Descripción Requerido"; valid = false
-            }
-            if (!valid) return@setOnClickListener
-
-            val dto = ArtistCreateDTO(
-                name = binding.etName.text.toString().trim(),
-                image = selectedPhotoUrl ?: "https://http.cat/images/102.jpg",
-                birthDate = sdf.format(cal.time),
-                description = binding.etDesc.text.toString().trim()
+        binding.buttonAddAlbum.setOnClickListener {
+            DialogHelper.showAddAlbumDialog(
+                layoutInflater = layoutInflater,
+                lifecycleOwner = viewLifecycleOwner,
+                viewModel = vm,
+                albumAdapter = albumAdapter
             )
-
-            vm.createArtist(dto)
+        }
+        binding.buttonAddPrize.setOnClickListener {
+            DialogHelper.showAddPrizeDialog(
+                layoutInflater = layoutInflater,
+                lifecycleOwner = viewLifecycleOwner,
+                viewModel = vm,
+                prizeAdapter = prizeInputAdapter
+            )
+        }
+        binding.btnCreateArtist.setOnClickListener {
+            sendAlbumData()
         }
 
-        vm.createResult.observe(viewLifecycleOwner) { ok ->
-            if (ok) {
+        vm.createResult.observe(viewLifecycleOwner) { success ->
+            if (success) {
                 Toast.makeText(requireContext(), "Artista creado", Toast.LENGTH_SHORT).show()
-                // avisamos para que el ArtistFragment refresque
+                sendAlbumDataComplements()
                 setFragmentResult("artist_created", Bundle())
                 findNavController().popBackStack()
             } else {
@@ -98,6 +79,60 @@ class CreateArtistFragment : Fragment() {
                     .show()
             }
         }
+        vm.prizes.observe(viewLifecycleOwner) { prizeList ->
+            prizeInputAdapter.updatePrizes(prizeList ?: emptyList())
+        }
+        vm.errorMessage.observe(viewLifecycleOwner) { error ->
+            if (error != null) {
+                Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun sendAlbumData() {
+        if (validateInputs()) {
+            val dto = ArtistCreateDTO(
+                name = binding.etName.text.toString().trim(),
+                image = selectedPhotoUrl ?: "https://http.cat/images/102.jpg",
+                birthDate = sdf.format(cal.time),
+                description = binding.etDesc.text.toString().trim()
+            )
+            // Step 1: Send artist data to the server
+            vm.createArtist(dto)
+        }
+    }
+
+    private fun sendAlbumDataComplements() {
+        // Step 2: Observe the result and send albums/prizes if lists are not empty
+        val createdArtistId = vm.getCreatedArtistId()
+
+        // Send albums if the list is not empty
+        val selectedAlbums = albumAdapter.getSelectedAlbums()
+        if (selectedAlbums.isNotEmpty() && createdArtistId != null) {
+            vm.addAlbumsToArtist(createdArtistId, selectedAlbums)
+        }
+
+        // Send prizes if the list is not empty
+        val selectedPrizes = prizeInputAdapter.getSelectedPrizes()
+        if (selectedPrizes.isNotEmpty() && createdArtistId != null) {
+            vm.addPrizesToArtist(createdArtistId, selectedPrizes)
+        }
+    }
+
+    private fun validateInputs(): Boolean {
+        var valid = true
+        listOf(binding.tilName, binding.tilBirth, binding.tilDesc).forEach { it.error = null }
+
+        if (binding.etName.text.isNullOrBlank()) {
+            binding.tilName.error = "Nombre obligatorio"; valid = false
+        }
+        if (binding.etBirth.text.isNullOrBlank()) {
+            binding.tilBirth.error = "Fecha de nacimiento requerida"; valid = false
+        }
+        if (binding.etDesc.text.isNullOrBlank()) {
+            binding.tilDesc.error = "Descripción requerida"; valid = false
+        }
+        return valid
     }
 
     private fun setupAdapters() {
@@ -112,155 +147,18 @@ class CreateArtistFragment : Fragment() {
             adapter = albumAdapter
         }
 
-        prizeAdapter = PrizeInputAdapter(mutableListOf())
+        // Initialize PrizeInputAdapter with performerPrizes and prizes
+        val performerPrizes = mutableListOf<PerformerPrize>() // Replace with actual data
+       // val prizes = vm.prizes.value ?: emptyList() // Fetch prizes from ViewModel
+        vm.fetchPrizes() // Fetch prizes from ViewModel
+        val prizes = vm.prizes.value ?: emptyList() // Fetch prizes from ViewModel
+        prizeInputAdapter = PrizeInputAdapter(performerPrizes, prizes)
+
         binding.recyclerViewPrizes.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-            adapter = prizeAdapter
+            adapter = prizeInputAdapter
         }
     }
-
-    private fun showAddAlbumDialog() {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_add_album, null)
-        val dropdownAlbum =
-            dialogView.findViewById<MaterialAutoCompleteTextView>(R.id.dropdown_album)
-        val guestHint = dialogView.findViewById<TextView>(R.id.guest_hint)
-
-        val builder = MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Selecciona un álbum")
-            .setView(dialogView)
-            .setPositiveButton("Agregar", null)
-            .setNegativeButton("Cancelar", null)
-
-        val dialog = builder.create()
-        dialog.show()
-
-        AlbumServiceAdapter.getAlbums().enqueue(object : Callback<List<Album>> {
-            override fun onResponse(call: Call<List<Album>>, resp: Response<List<Album>>) {
-                val list = resp.body().orEmpty()
-                val filteredList = list.filter { album ->
-                    albumAdapter.albumList.none { it.id == album.id }
-                }
-                if (filteredList.isEmpty()) {
-                    guestHint.visibility = View.VISIBLE
-                    dialog.getButton(DialogInterface.BUTTON_POSITIVE).isEnabled = false
-                } else {
-                    guestHint.visibility = View.GONE
-                    val names = filteredList.map { it.name }
-                    val adapter = ArrayAdapter(
-                        requireContext(),
-                        android.R.layout.simple_dropdown_item_1line,
-                        names
-                    )
-                    dropdownAlbum.setAdapter(adapter)
-                    dialog.getButton(DialogInterface.BUTTON_POSITIVE).isEnabled = true
-
-                    dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
-                        val selected = dropdownAlbum.text.toString().trim()
-
-                        if (selected.isEmpty()) {
-                            dropdownAlbum.error = "Selecciona un álbum"
-                            return@setOnClickListener
-                        }
-
-                        val index = names.indexOf(selected)
-                        if (index >= 0) {
-                            val selectedAlbum = filteredList[index]
-                            val updatedList = albumAdapter.albumList.toMutableList().apply {
-                                add(selectedAlbum)
-                            }
-                            albumAdapter.updateAlbums(updatedList)
-                            dialog.dismiss()
-                        }
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<List<Album>>, t: Throwable) {
-                Toast.makeText(context, "Error cargando álbumes", Toast.LENGTH_SHORT).show()
-                guestHint.text = "No se pudieron cargar los álbumes."
-                guestHint.visibility = View.VISIBLE
-                dialog.getButton(DialogInterface.BUTTON_POSITIVE).isEnabled = false
-            }
-        })
-    }
-
-
-    private fun showAddPrizeDialog() {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_add_prize, null)
-        val prizeDropdown =
-            dialogView.findViewById<MaterialAutoCompleteTextView>(
-                R.id.dropdownPrize
-            )
-        val inputDate =
-            dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.inputPrizeDate)
-                .apply {
-                    val randomCalendar = Calendar.getInstance().apply {
-                        set((1950..2023).random(), (0..11).random(), (1..28).random())
-                    }
-                    setText(
-                        SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(
-                            randomCalendar.time
-                        )
-                    )
-                }
-
-        val builder = MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Agregar Premio")
-            .setView(dialogView)
-            .setPositiveButton("Agregar", null)
-            .setNegativeButton("Cancelar", null)
-
-        val dialog = builder.create()
-        dialog.show()
-
-        // Pre-cargar lista de premios
-        ArtistServiceAdapter.getPrizes().enqueue(object : Callback<List<Prize>> {
-            override fun onResponse(
-                call: Call<List<Prize>>,
-                resp: Response<List<Prize>>
-            ) {
-                val list = resp.body().orEmpty()
-                val names =
-                    if (list.isNotEmpty()) list.map { it.name } else listOf("No hay premios disponibles")
-                prizeDropdown.setAdapter(
-                    ArrayAdapter(
-                        requireContext(),
-                        android.R.layout.simple_dropdown_item_1line,
-                        names
-                    )
-                )
-            }
-
-            override fun onFailure(call: retrofit2.Call<List<Prize>>, t: Throwable) {
-                Toast.makeText(
-                    context,
-                    "No se pudieron obtener datos del servidor",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        })
-
-        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
-            val prizeName = prizeDropdown.text.toString().trim()
-            val date = inputDate.text.toString().trim()
-
-            var valid = true
-            if (prizeName.isEmpty()) {
-                prizeDropdown.error = "Selecciona un premio"
-                valid = false
-            }
-            if (date.isEmpty()) {
-                inputDate.error = "Fecha requerida"
-                valid = false
-            }
-
-            if (!valid) return@setOnClickListener
-
-            prizeAdapter.addPrize(prizeName, date)
-            dialog.dismiss()
-        }
-    }
-
 
     private fun setupArtistName() {
         var isFirstClick = true
@@ -319,6 +217,7 @@ class CreateArtistFragment : Fragment() {
 
     private fun loadRandomProfilePhoto() {
         val randomImageUrl = "https://i.pravatar.cc/300?u=${System.currentTimeMillis()}"
+        hideKeyboard(requireContext())
 
         binding.imagePreview.apply {
             layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT

@@ -38,7 +38,7 @@ class MainActivityTest {
     @Test
     fun navigateToFavorites_updatesTopBarTitle() {
         onView(withId(R.id.bottomNavigationView))
-            .perform(clickOnItem(R.id.favoritesFragment))
+            .perform(clickOnItem(R.id.collectorsFragment))
         onView(withId(R.id.topAppBar))
             .check(matches(hasDescendant(withText("Favoritos"))))
     }
