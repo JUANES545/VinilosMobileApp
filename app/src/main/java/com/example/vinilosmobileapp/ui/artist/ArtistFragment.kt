@@ -1,11 +1,15 @@
 package com.example.vinilosmobileapp.ui.artist
 
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
@@ -89,10 +93,11 @@ class ArtistFragment : Fragment() {
             binding.swipeRefreshArtist.isRefreshing = false
 
             if (!list.isNullOrEmpty()) {
+                val sortedList = list.sortedByDescending { it.id }
                 binding.recyclerViewArtists.visibility = View.VISIBLE
                 binding.errorLayout.errorContainer.visibility = View.GONE
-                artistAdapter.updateArtists(list)
-                allArtists = list
+                artistAdapter.updateArtists(sortedList)
+                allArtists = sortedList
                 applyFilter()
             } else if (list != null && list.isEmpty()) {
                 showEmptyState()
@@ -138,8 +143,6 @@ class ArtistFragment : Fragment() {
         binding.fabFilterFavorites.setOnClickListener {
             showingFavorites = !showingFavorites
             updateFilterIcon()
-            (requireActivity() as AppCompatActivity).supportActionBar?.title =
-                if (showingFavorites) "Artistas Favoritos" else "Todos los Artistas"
             applyFilter()
         }
     }
@@ -152,6 +155,21 @@ class ArtistFragment : Fragment() {
     }
 
     private fun applyFilter() {
+        val title = if (showingFavorites) "Artistas Favoritos" else "Todos los Artistas"
+        val spannableTitle = SpannableString(title).apply {
+            if (showingFavorites) {
+                setSpan(
+                    ForegroundColorSpan(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.gold
+                        )
+                    ), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+        }
+        (requireActivity() as AppCompatActivity).supportActionBar?.title = spannableTitle
+
         val listToShow = if (showingFavorites) {
             allArtists.filter { FavoritesManager.isFavorite(requireContext(), it.id) }
         } else {
@@ -166,6 +184,9 @@ class ArtistFragment : Fragment() {
                 emptyMessage = getString(R.string.artist_no_favorites),
                 emptyIconRes = R.drawable.ic_empty_list
             )
+        } else {
+            binding.errorLayout.errorContainer.visibility = View.GONE
+            binding.recyclerViewArtists.visibility = View.VISIBLE
         }
 
         artistAdapter.updateArtists(listToShow)

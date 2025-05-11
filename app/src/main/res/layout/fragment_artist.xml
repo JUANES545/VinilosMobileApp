@@ -7,6 +7,7 @@
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/artistContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="16dp"
@@ -27,12 +28,12 @@
         <include
             android:id="@+id/errorLayout"
             layout="@layout/layout_error_state"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:visibility="gone"
-            tools:visibility="visible"/>
+            tools:visibility="visible" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_add_artist"
@@ -57,7 +58,7 @@
             app:layout_anchor="@id/recyclerViewArtists"
             app:layout_anchorGravity="bottom|end"
             app:layout_constraintBottom_toTopOf="@+id/fab_add_artist"
-            app:layout_constraintEnd_toEndOf="@+id/recyclerViewArtists"
+            app:layout_constraintEnd_toEndOf="@+id/artistContainer"
             app:srcCompat="@drawable/ic_star_filled"
             app:tint="@color/gold" />
     </androidx.constraintlayout.widget.ConstraintLayout>
