@@ -25,6 +25,7 @@ class DetailArtistFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: DetailArtistViewModel by viewModels()
+    private val vm: CreateArtistViewModel by viewModels()
     private lateinit var albumsAdapter: AlbumAdapter
     private lateinit var prizesAdapter: PrizeAdapter
 
@@ -73,9 +74,11 @@ class DetailArtistFragment : Fragment() {
     }
 
     private fun setupPrizesRecyclerView() {
+        vm.fetchPrizes()
+        val prizes = vm.prizes.value ?: emptyList() // Fetch prizes from ViewModel
         prizesAdapter = PrizeAdapter(
-            viewModel.artist.value?.performerPrizes ?: emptyList(),
-            viewModel.artist.value?.prizes ?: emptyList()
+            performerPrizes = viewModel.artist.value?.performerPrizes ?: emptyList(),
+            prizes = prizes
         )
         binding.recyclerPrizes.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
@@ -92,6 +95,12 @@ class DetailArtistFragment : Fragment() {
                 binding.progressBar.visibility = View.GONE
                 Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
             }
+        }
+        vm.prizes.observe(viewLifecycleOwner) { prizes ->
+            prizesAdapter.updatePrizes(
+                viewModel.artist.value?.performerPrizes ?: emptyList(),
+                prizes
+            )
         }
     }
 

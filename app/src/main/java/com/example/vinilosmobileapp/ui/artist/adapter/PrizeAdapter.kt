@@ -21,7 +21,7 @@ class PrizeAdapter(
             }
             binding.tvPrizeName.text = prize?.name ?: "Premio desconocido"
             binding.tvOrganization.text = prize?.organization ?: "Organización desconocida"
-            binding.tvDateAwarded.text = performerPrize.premiationDate.take(10) // Format date
+            binding.tvDateAwarded.text = performerPrize.premiationDate.take(10)
         }
     }
 
