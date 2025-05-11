@@ -77,6 +77,7 @@ object DialogHelper {
                     names
                 )
                 dropdownAlbum.setAdapter(adapter)
+                dropdownAlbum.setText(names.random(), false)
                 dialog.getButton(DialogInterface.BUTTON_POSITIVE).isEnabled = names.isNotEmpty()
 
                 dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
@@ -168,6 +169,7 @@ object DialogHelper {
                         names
                     )
                 )
+                prizeDropdown.setText(names.random(), false)
             }
         }
 
