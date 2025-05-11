@@ -4,15 +4,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.vinilosmobileapp.model.Album
+import com.example.vinilosmobileapp.model.PerformerPrize
 import com.example.vinilosmobileapp.model.Prize
 import com.example.vinilosmobileapp.model.dto.ArtistCreateDTO
 import com.example.vinilosmobileapp.repository.AlbumRepository
 import com.example.vinilosmobileapp.repository.ArtistRepository
 
 class CreateArtistViewModel : ViewModel() {
+
     private val artistRepository = ArtistRepository()
     private val albumRepository = AlbumRepository()
-
 
     private val _createResult = MutableLiveData<Boolean>()
     val createResult: LiveData<Boolean> get() = _createResult
@@ -26,12 +27,18 @@ class CreateArtistViewModel : ViewModel() {
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> get() = _errorMessage
 
+    private var createdArtistId: Int? = null
 
     fun createArtist(dto: ArtistCreateDTO) {
-        artistRepository.createArtist(
-            dto,
-            onSuccess = { _createResult.value = true },
-            onError = { _createResult.value = false }
+        artistRepository.createArtist(dto,
+            onSuccess = { artistId ->
+                _createResult.postValue(true)
+                createdArtistId = artistId
+            },
+            onError = { error ->
+                _createResult.value = false
+                _errorMessage.value = error
+            }
         )
     }
 
@@ -48,4 +55,38 @@ class CreateArtistViewModel : ViewModel() {
             onError = { _errorMessage.value = it }
         )
     }
+
+    fun getCreatedArtistId(): Int? {
+        return createdArtistId
+    }
+
+    fun addAlbumsToArtist(artistId: Int, albumIds: List<Album>) {
+        albumIds.forEach { album ->
+            artistRepository.addAlbumToArtist(artistId, album.id,
+                onSuccess = {
+                    // Handle success if needed
+                },
+                onError = { error ->
+                    _errorMessage.value = error
+                }
+            )
+        }
+    }
+
+    fun addPrizesToArtist(artistId: Int, prizes: List<PerformerPrize>) {
+        prizes.forEach { prize ->
+            artistRepository.addPrizeToArtist(
+                prizeId = prize.id,
+                artistId = artistId,
+                premiationDate = prize.premiationDate,
+                onSuccess = {
+                    // Handle success if needed
+                },
+                onError = { error ->
+                    _errorMessage.value = error
+                }
+            )
+        }
+    }
+
 }

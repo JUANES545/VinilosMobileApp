@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import com.example.vinilosmobileapp.R
 import com.example.vinilosmobileapp.databinding.FragmentDetailArtistBinding
@@ -37,28 +38,64 @@ class DetailArtistFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         (requireActivity() as AppCompatActivity).supportActionBar?.title =
             getString(R.string.artist_detail)
+
+        val artistId = getArtistIdFromArguments() ?: return
+
+        setupMusicType()
+        setupRecyclerViews()
+        setupObservers()
+        fetchArtistDetails(artistId)
+    }
+
+    private fun getArtistIdFromArguments(): Int? {
         val artistId = arguments?.getInt("artistId") ?: -1
         if (artistId < 0) {
             Toast.makeText(requireContext(), "ID de artista inválido", Toast.LENGTH_SHORT).show()
-            return
+            return null
         }
+        return artistId
+    }
 
-        setupMusicType()
-        setupAlbums()
-        setupPrizes()
+    private fun setupRecyclerViews() {
+        setupAlbumsRecyclerView()
+        setupPrizesRecyclerView()
+    }
 
-        // Observers
+    private fun setupAlbumsRecyclerView() {
+        albumsAdapter = AlbumAdapter(emptyList()) { albumId ->
+            val bundle = Bundle().apply { putInt("albumId", albumId) }
+            findNavController().navigate(R.id.detailAlbumFragment, bundle)
+        }
+        binding.recyclerAlbums.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            adapter = albumsAdapter
+        }
+    }
+
+    private fun setupPrizesRecyclerView() {
+        prizesAdapter = PrizeAdapter(
+            viewModel.artist.value?.performerPrizes ?: emptyList(),
+            viewModel.artist.value?.prizes ?: emptyList()
+        )
+        binding.recyclerPrizes.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            adapter = prizesAdapter
+        }
+    }
+
+    private fun setupObservers() {
         viewModel.artist.observe(viewLifecycleOwner) { artist ->
             artist?.let { showArtistDetails(it) }
         }
-        viewModel.error.observe(viewLifecycleOwner) { err ->
-            err?.let {
+        viewModel.error.observe(viewLifecycleOwner) { error ->
+            error?.let {
                 binding.progressBar.visibility = View.GONE
                 Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
             }
         }
+    }
 
-        // Fetch
+    private fun fetchArtistDetails(artistId: Int) {
         binding.progressBar.visibility = View.VISIBLE
         viewModel.fetchArtist(artistId)
     }
@@ -71,65 +108,62 @@ class DetailArtistFragment : Fragment() {
         binding.tvRoleLocation.text = "$genre - $recordLabel"
     }
 
-    private fun setupPrizes() {
-        with(binding) {
-            prizesAdapter = PrizeAdapter(emptyList())
-            recyclerPrizes.adapter = prizesAdapter
-
-            tvStatPrizes.text = prizesAdapter.itemCount.toString()
-            if (prizesAdapter.itemCount == 0) {
-                textNoPrizes.visibility = View.VISIBLE
-                recyclerPrizes.visibility = View.GONE
-            } else {
-                textNoPrizes.visibility = View.GONE
-                recyclerPrizes.visibility = View.VISIBLE
-            }
-        }
-    }
-
-    private fun setupAlbums() {
-        albumsAdapter = AlbumAdapter(emptyList()) { albumId ->
-            val bundle = Bundle().apply { putInt("albumId", albumId) }
-            findNavController().navigate(R.id.detailAlbumFragment, bundle)
-        }
-        with(binding) {
-            recyclerAlbums.adapter = albumsAdapter
-
-            tvStatAlbums.text = albumsAdapter.itemCount.toString()
-            if (albumsAdapter.itemCount == 0) {
-                textNoAlbums.visibility = View.VISIBLE
-                recyclerAlbums.visibility = View.GONE
-            } else {
-                textNoAlbums.visibility = View.GONE
-                recyclerAlbums.visibility = View.VISIBLE
-            }
-        }
-    }
-
     private fun showArtistDetails(artistDetail: ArtistDetail) {
         with(binding) {
             progressBar.visibility = View.GONE
             contentLayout.visibility = View.VISIBLE
 
+            displayArtistInfo(artistDetail)
+            updateAlbumsSection(artistDetail)
+            updatePrizesSection(artistDetail)
+        }
+    }
+
+    private fun displayArtistInfo(artistDetail: ArtistDetail) {
+        with(binding) {
             ivArtist.load(artistDetail.image) {
                 placeholder(R.drawable.ic_artists)
                 error(R.drawable.ic_failed_to_load_image)
                 listener(
-                    onSuccess = { _, _ ->
-                        shimmerArtist.hideShimmer()
-                    },
-                    onError = { _, _ ->
-                        shimmerArtist.hideShimmer()
-                    }
+                    onSuccess = { _, _ -> shimmerArtist.hideShimmer() },
+                    onError = { _, _ -> shimmerArtist.hideShimmer() }
                 )
             }
             tvName.text = artistDetail.name
             tvDescription.text = artistDetail.description
+            tvStatAlbums.text = artistDetail.albums.size.toString()
+            tvStatPrizes.text = artistDetail.performerPrizes.size.toString()
             tvBirthDate.text = artistDetail.birthDate.take(10)
         }
+    }
 
-        albumsAdapter.updateAlbums(artistDetail.albums)
-        prizesAdapter.updatePrizes(artistDetail.performerPrizes)
+    private fun updateAlbumsSection(artistDetail: ArtistDetail) {
+        with(binding) {
+            if (artistDetail.albums.isNotEmpty()) {
+                recyclerAlbums.visibility = View.VISIBLE
+                textNoAlbums.visibility = View.GONE
+                albumsAdapter.updateAlbums(artistDetail.albums)
+            } else {
+                recyclerAlbums.visibility = View.GONE
+                textNoAlbums.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun updatePrizesSection(artistDetail: ArtistDetail) {
+        with(binding) {
+            if (artistDetail.performerPrizes.isNotEmpty()) {
+                recyclerPrizes.visibility = View.VISIBLE
+                textNoPrizes.visibility = View.GONE
+                prizesAdapter.updatePrizes(
+                    artistDetail.performerPrizes,
+                    viewModel.prizes.value ?: emptyList()
+                )
+            } else {
+                recyclerPrizes.visibility = View.GONE
+                textNoPrizes.visibility = View.VISIBLE
+            }
+        }
     }
 
     override fun onDestroyView() {

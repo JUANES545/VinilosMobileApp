@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import com.example.vinilosmobileapp.R
 import com.example.vinilosmobileapp.databinding.FragmentCreateArtistBinding
+import com.example.vinilosmobileapp.model.PerformerPrize
 import com.example.vinilosmobileapp.model.dto.ArtistCreateDTO
 import com.example.vinilosmobileapp.ui.artist.adapter.PrizeInputAdapter
 import com.example.vinilosmobileapp.ui.home.adapter.AlbumAdapter
@@ -34,7 +35,7 @@ class CreateArtistFragment : Fragment() {
     private var selectedPhotoUrl: String? = null
 
     private lateinit var albumAdapter: AlbumAdapter
-    private lateinit var prizeAdapter: PrizeInputAdapter
+    private lateinit var prizeInputAdapter: PrizeInputAdapter
 
     override fun onCreateView(i: LayoutInflater, c: ViewGroup?, s: Bundle?) =
         FragmentCreateArtistBinding.inflate(i, c, false).also { _binding = it }.root
@@ -60,24 +61,17 @@ class CreateArtistFragment : Fragment() {
                 layoutInflater = layoutInflater,
                 lifecycleOwner = viewLifecycleOwner,
                 viewModel = vm,
-                prizeAdapter = prizeAdapter
+                prizeAdapter = prizeInputAdapter
             )
         }
         binding.btnCreateArtist.setOnClickListener {
-            if (validateInputs()) {
-                val dto = ArtistCreateDTO(
-                    name = binding.etName.text.toString().trim(),
-                    image = selectedPhotoUrl ?: "https://http.cat/images/102.jpg",
-                    birthDate = sdf.format(cal.time),
-                    description = binding.etDesc.text.toString().trim()
-                )
-                vm.createArtist(dto)
-            }
+            sendAlbumData()
         }
 
         vm.createResult.observe(viewLifecycleOwner) { success ->
             if (success) {
                 Toast.makeText(requireContext(), "Artista creado", Toast.LENGTH_SHORT).show()
+                sendAlbumDataComplements()
                 setFragmentResult("artist_created", Bundle())
                 findNavController().popBackStack()
             } else {
@@ -85,10 +79,43 @@ class CreateArtistFragment : Fragment() {
                     .show()
             }
         }
+        vm.prizes.observe(viewLifecycleOwner) { prizeList ->
+            prizeInputAdapter.updatePrizes(prizeList ?: emptyList())
+        }
         vm.errorMessage.observe(viewLifecycleOwner) { error ->
             if (error != null) {
                 Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun sendAlbumData() {
+        if (validateInputs()) {
+            val dto = ArtistCreateDTO(
+                name = binding.etName.text.toString().trim(),
+                image = selectedPhotoUrl ?: "https://http.cat/images/102.jpg",
+                birthDate = sdf.format(cal.time),
+                description = binding.etDesc.text.toString().trim()
+            )
+            // Step 1: Send artist data to the server
+            vm.createArtist(dto)
+        }
+    }
+
+    private fun sendAlbumDataComplements() {
+        // Step 2: Observe the result and send albums/prizes if lists are not empty
+        val createdArtistId = vm.getCreatedArtistId()
+
+        // Send albums if the list is not empty
+        val selectedAlbums = albumAdapter.getSelectedAlbums()
+        if (selectedAlbums.isNotEmpty() && createdArtistId != null) {
+            vm.addAlbumsToArtist(createdArtistId, selectedAlbums)
+        }
+
+        // Send prizes if the list is not empty
+        val selectedPrizes = prizeInputAdapter.getSelectedPrizes()
+        if (selectedPrizes.isNotEmpty() && createdArtistId != null) {
+            vm.addPrizesToArtist(createdArtistId, selectedPrizes)
         }
     }
 
@@ -120,10 +147,16 @@ class CreateArtistFragment : Fragment() {
             adapter = albumAdapter
         }
 
-        prizeAdapter = PrizeInputAdapter(mutableListOf())
+        // Initialize PrizeInputAdapter with performerPrizes and prizes
+        val performerPrizes = mutableListOf<PerformerPrize>() // Replace with actual data
+       // val prizes = vm.prizes.value ?: emptyList() // Fetch prizes from ViewModel
+        vm.fetchPrizes() // Fetch prizes from ViewModel
+        val prizes = vm.prizes.value ?: emptyList() // Fetch prizes from ViewModel
+        prizeInputAdapter = PrizeInputAdapter(performerPrizes, prizes)
+
         binding.recyclerViewPrizes.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-            adapter = prizeAdapter
+            adapter = prizeInputAdapter
         }
     }
 

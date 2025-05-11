@@ -12,14 +12,13 @@ data class ArtistDetail(
 
 data class PerformerPrize(
     val id: Int,
-    val prizeName: String,
-    val organization: String,
-    val awardedDate: String
+    val premiationDate: String
 )
 
 data class Prize(
     val id: Int,
     val organization: String,
     val name: String,
-    val description: String
+    val description: String,
+    val performerPrizes: List<PerformerPrize> = emptyList()
 )

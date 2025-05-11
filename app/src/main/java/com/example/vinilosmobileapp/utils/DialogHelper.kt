@@ -10,6 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import com.example.vinilosmobileapp.R
+import com.example.vinilosmobileapp.model.PerformerPrize
 import com.example.vinilosmobileapp.ui.artist.CreateArtistViewModel
 import com.example.vinilosmobileapp.ui.artist.adapter.PrizeInputAdapter
 import com.example.vinilosmobileapp.ui.home.adapter.AlbumAdapter
@@ -77,8 +78,12 @@ object DialogHelper {
                     names
                 )
                 dropdownAlbum.setAdapter(adapter)
-                dropdownAlbum.setText(names.random(), false)
-                dialog.getButton(DialogInterface.BUTTON_POSITIVE).isEnabled = names.isNotEmpty()
+                if (names.isNotEmpty()) {
+                    dropdownAlbum.setText(names.random(), false)
+                    dialog.getButton(DialogInterface.BUTTON_POSITIVE).isEnabled = true
+                } else {
+                    dialog.getButton(DialogInterface.BUTTON_POSITIVE).isEnabled = false
+                }
 
                 dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
                     val selected = dropdownAlbum.text.toString().trim()
@@ -195,8 +200,17 @@ object DialogHelper {
 
             if (!valid) return@setOnClickListener
 
-            prizeAdapter.addPrize(prizeName, date)
-            dialog.dismiss()
+            val selectedPrize = prizesLiveData.value?.find { it.name == prizeName }
+            if (selectedPrize != null) {
+                val performerPrize = PerformerPrize(
+                    id = selectedPrize.id,
+                    premiationDate = date
+                )
+                prizeAdapter.addPrize(performerPrize)
+                dialog.dismiss()
+            } else {
+                Toast.makeText(context, "Premio no encontrado", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
