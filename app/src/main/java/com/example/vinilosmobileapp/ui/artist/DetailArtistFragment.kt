@@ -43,8 +43,8 @@ class DetailArtistFragment : Fragment() {
         val artistId = getArtistIdFromArguments() ?: return
 
         setupMusicType()
-        setupRecyclerViews()
         setupObservers()
+        setupRecyclerViews()
         fetchArtistDetails(artistId)
     }
 
@@ -75,7 +75,7 @@ class DetailArtistFragment : Fragment() {
 
     private fun setupPrizesRecyclerView() {
         vm.fetchPrizes()
-        val prizes = vm.prizes.value ?: emptyList() // Fetch prizes from ViewModel
+        val prizes = vm.prizes.value ?: emptyList()
         prizesAdapter = PrizeAdapter(
             performerPrizes = viewModel.artist.value?.performerPrizes ?: emptyList(),
             prizes = prizes
