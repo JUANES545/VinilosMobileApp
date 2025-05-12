@@ -32,18 +32,6 @@ class AlbumRepository {
         })
     }
 
-    fun createAlbum(albumCreateDTO: AlbumCreateDTO) {
-        AlbumServiceAdapter.createAlbum(albumCreateDTO).enqueue(object : Callback<Album> {
-            override fun onResponse(call: Call<Album>, response: Response<Album>) {
-                createAlbumResult.value = response.isSuccessful
-            }
-
-            override fun onFailure(call: Call<Album>, t: Throwable) {
-                createAlbumResult.value = false
-            }
-        })
-    }
-
     fun getAlbumDetail(
         albumId: Int,
         onSuccess: (AlbumDetail) -> Unit,
