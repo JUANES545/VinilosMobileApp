@@ -118,8 +118,8 @@ class DetailArtistFragment : Fragment() {
     }
 
     private fun showArtistDetails(artistDetail: ArtistDetail) {
-        progressBar.visibility = View.GONE
-        contentLayout.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.GONE
+        binding.contentLayout.visibility = View.VISIBLE
 
         displayArtistInfo(artistDetail)
         updateAlbumsSection(artistDetail)
