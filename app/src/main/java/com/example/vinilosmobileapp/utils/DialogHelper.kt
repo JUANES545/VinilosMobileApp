@@ -1,5 +1,6 @@
 package com.example.vinilosmobileapp.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
 import android.view.LayoutInflater
@@ -30,6 +31,7 @@ object DialogHelper {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     fun showAddAlbumDialog(
         layoutInflater: LayoutInflater,
         lifecycleOwner: LifecycleOwner,

@@ -10,7 +10,7 @@
         android:id="@+id/inputCommentLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Comentario">
+        android:hint="@string/comentario">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/inputComment"
@@ -25,7 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="Selecciona un usuario">
+        android:hint="@string/selecciona_un_usuario">
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
             android:id="@+id/inputAuthor"
@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
         android:layout_marginTop="8dp"
-        android:text="No hay coleccionistas registrados,\n el comentario será anónimo."
+        android:text="@string/no_hay_coleccionistas_registrados_n_el_comentario_ser_an_nimo"
         android:textColor="@color/black"
         android:textSize="12sp"
         android:visibility="visible" />

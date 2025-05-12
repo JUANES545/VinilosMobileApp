@@ -1,5 +1,6 @@
 package com.example.vinilosmobileapp.ui.album
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -115,6 +116,7 @@ class DetailAlbumFragment : Fragment() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun showAlbum(album: AlbumDetail) {
         binding.contentLayout.visibility = View.VISIBLE
         binding.errorLayout.visibility = View.GONE

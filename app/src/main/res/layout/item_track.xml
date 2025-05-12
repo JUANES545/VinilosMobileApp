@@ -6,7 +6,6 @@
     android:layout_marginHorizontal="4dp"
     android:layout_marginTop="4dp"
     android:layout_marginBottom="8dp"
-    android:background="@color/white"
     card_view:cardCornerRadius="12dp"
     card_view:cardElevation="4dp">
 
@@ -21,7 +20,7 @@
             android:id="@+id/trackTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nombre de la canción"
+            android:text="@string/nombre_de_la_canci_n"
             android:textColor="@color/black"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -31,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Duración"
+            android:text="@string/duraci_n"
             android:textColor="@color/black"
             android:textSize="12sp" />
     </LinearLayout>

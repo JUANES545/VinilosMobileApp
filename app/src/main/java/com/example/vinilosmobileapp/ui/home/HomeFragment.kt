@@ -77,7 +77,7 @@ class HomeFragment : Fragment() {
         viewModel.albums.observe(viewLifecycleOwner) { albums ->
             binding.swipeRefresh.isRefreshing = false
 
-            if (albums != null && albums.isNotEmpty()) {
+            if (!albums.isNullOrEmpty()) {
                 val sortedAlbums = albums.sortedByDescending { it.id }
 
                 binding.recyclerViewAlbums.visibility = View.VISIBLE

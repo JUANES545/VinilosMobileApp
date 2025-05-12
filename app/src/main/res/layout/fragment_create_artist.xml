@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white_background">
+    android:layout_height="match_parent">
 
     <!-- NestedScrollView para el contenido -->
     <androidx.core.widget.NestedScrollView
@@ -26,7 +25,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
-                android:hint="Nombre">
+                android:hint="@string/nombre">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etName"
@@ -40,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="12dp"
-                android:hint="Fecha de nacimiento">
+                android:hint="@string/fecha_de_nacimiento">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etBirth"
@@ -55,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="12dp"
-                android:hint="Descripción">
+                android:hint="@string/descripci_n">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etDesc"
@@ -86,13 +85,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Toca para subir foto de perfil"
+                    android:text="@string/toca_para_subir_foto_de_perfil"
                     android:textColor="?attr/colorOnSurface" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="PNG, JPG hasta 5MB"
+                    android:text="@string/png_jpg_hasta_5mb"
                     android:textColor="?attr/colorOnSurface"
                     android:textSize="12sp"
                     android:visibility="gone" />
@@ -104,7 +103,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="24dp"
-                android:text="Lista de Álbumes"
+                android:text="@string/lista_de_lbumes"
                 android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -120,7 +119,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="8dp"
-                android:text="Agregar Álbum"
+                android:text="@string/agregar_lbum"
                 android:textAllCaps="false"
                 app:icon="@drawable/ic_add"
                 app:iconGravity="textStart" />
@@ -131,7 +130,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="24dp"
-                android:text="Lista de Premios"
+                android:text="@string/lista_de_premios"
                 android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -148,7 +147,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="26dp"
-                android:text="Agregar Premio"
+                android:text="@string/agregar_premio"
                 android:textAllCaps="false"
                 app:icon="@drawable/ic_add"
                 app:iconGravity="textStart" />
@@ -165,7 +164,7 @@
         android:layout_marginHorizontal="26dp"
         android:backgroundTint="?attr/colorPrimary"
         android:padding="16dp"
-        android:text="Crear Artista"
+        android:text="@string/crear_artista"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

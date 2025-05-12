@@ -60,6 +60,7 @@
             app:layout_constraintBottom_toTopOf="@+id/fab_add_artist"
             app:layout_constraintEnd_toEndOf="@+id/artistContainer"
             app:srcCompat="@drawable/ic_star_filled"
-            app:tint="@color/gold" />
+            app:tint="@color/gold"
+            tools:ignore="ContentDescription" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

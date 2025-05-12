@@ -1,5 +1,6 @@
 package com.example.vinilosmobileapp.ui.artist.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -40,6 +41,7 @@ class PrizeAdapter(
 
     override fun getItemCount() = performerPrizes.size
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updatePrizes(newPerformerPrizes: List<PerformerPrize>, newPrizes: List<Prize>) {
         performerPrizes = newPerformerPrizes
         prizes = newPrizes

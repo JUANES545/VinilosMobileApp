@@ -1,5 +1,6 @@
 package com.example.vinilosmobileapp.ui.album.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -28,6 +29,7 @@ class TrackInputAdapter(private var tracks: List<Track>) :
 
     override fun getItemCount(): Int = tracks.size
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateTracks(newTracks: List<Track>) {
         tracks = newTracks
         notifyDataSetChanged()

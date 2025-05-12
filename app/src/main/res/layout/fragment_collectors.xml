@@ -3,14 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white_background"
     android:padding="16dp">
 
     <TextView
         android:id="@+id/tvFavoritesTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pantalla de Coleccionistas"
+        android:text="@string/pantalla_de_coleccionistas"
         android:textAppearance="?attr/textAppearanceHeadline6"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

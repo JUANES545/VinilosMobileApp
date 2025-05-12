@@ -34,7 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="4dp"
-            android:text="Album Name"
+            android:text="@string/album_name"
             android:textColor="@color/black"
             android:textStyle="bold" />
 
@@ -42,7 +42,7 @@
             android:id="@+id/textViewArtist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Artist Name" />
+            android:text="@string/artist_name" />
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>
