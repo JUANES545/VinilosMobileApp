@@ -1,5 +1,6 @@
 package com.example.vinilosmobileapp.ui.home.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -51,6 +52,7 @@ class AlbumAdapter(
 
     override fun getItemCount(): Int = albumList.size
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateAlbums(newAlbums: List<Album>) {
         albumList = newAlbums
         notifyDataSetChanged()

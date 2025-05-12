@@ -3,7 +3,6 @@ package com.example.vinilosmobileapp.repository
 import androidx.lifecycle.MutableLiveData
 import com.example.vinilosmobileapp.datasource.remote.AlbumServiceAdapter
 import com.example.vinilosmobileapp.model.Album
-import com.example.vinilosmobileapp.model.dto.AlbumCreateDTO
 import com.example.vinilosmobileapp.model.AlbumDetail
 import retrofit2.Call
 import retrofit2.Callback
@@ -28,18 +27,6 @@ class AlbumRepository {
 
             override fun onFailure(call: Call<List<Album>>, t: Throwable) {
                 onError("No se pudo conectar al servidor. Verifica tu conexión.")
-            }
-        })
-    }
-
-    fun createAlbum(albumCreateDTO: AlbumCreateDTO) {
-        AlbumServiceAdapter.createAlbum(albumCreateDTO).enqueue(object : Callback<Album> {
-            override fun onResponse(call: Call<Album>, response: Response<Album>) {
-                createAlbumResult.value = response.isSuccessful
-            }
-
-            override fun onFailure(call: Call<Album>, t: Throwable) {
-                createAlbumResult.value = false
             }
         })
     }

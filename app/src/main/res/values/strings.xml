@@ -14,7 +14,6 @@
 
 
     <!-- Artist screen -->
-    <string name="artist_create_new">Crear Nuevo Artista</string>
     <string name="artist_detail">Detalles del Artista</string>
     <string name="artist_no_favorites">No tienes artistas favoritos :c</string>
 
@@ -23,8 +22,56 @@
     <string name="error_connection">Error de conexión\n\n%1$s</string>
     <string name="error_create_album">No hay álbumes disponibles\n\nCrea uno nuevo.</string>
     <string name="error_create_artist">No hay artistas disponibles\n\nCrea uno nuevo.</string>
-    <string name="error_network_server">No se pudo conectar al servidor. Verifica tu conexión.</string>
     <string name="error_retry">Reintentar</string>
+    <string name="lbum">Álbum</string>
+    <string name="no_hay_lbums_que_mostrar">No hay álbums que mostrar</string>
+    <string name="comentario">Comentario</string>
+    <string name="selecciona_un_usuario">Selecciona un usuario</string>
+    <string name="no_hay_coleccionistas_registrados_n_el_comentario_ser_an_nimo">No hay coleccionistas registrados,\n el comentario será anónimo.</string>
+    <string name="premio">Premio</string>
+    <string name="fecha_de_premiaci_n">Fecha de premiación</string>
+    <string name="nombre_de_la_canci_n">Nombre de la canción</string>
+    <string name="duraci_n_opcional">Duración (opcional)</string>
+    <string name="pantalla_de_coleccionistas">Pantalla de Coleccionistas</string>
+    <string name="nombre_del_album">Nombre del Album</string>
+    <string name="a_o_de_lanzamiento">Año de Lanzamiento</string>
+    <string name="selecciona_un_g_nero">Selecciona un género</string>
+    <string name="selecciona_un_sello_discogr_fico">Selecciona un sello discográfico</string>
+    <string name="descripci_n_opcional">Descripción (opcional)</string>
+    <string name="imagen_del_lbum">Imagen del Álbum</string>
+    <string name="toca_para_subir_una_imagen">Toca para subir una imagen</string>
+    <string name="png_jpg_hasta_5mb">PNG, JPG hasta 5MB</string>
+    <string name="lista_de_canciones">Lista de Canciones</string>
+    <string name="agregar_canci_n">Agregar Canción</string>
+    <string name="agregar_comentario">Agregar Comentario</string>
+    <string name="comentarios_iniciales">Comentarios Iniciales</string>
+    <string name="crear_lbum">Crear Álbum</string>
+    <string name="nombre">Nombre</string>
+    <string name="fecha_de_nacimiento">Fecha de nacimiento</string>
+    <string name="descripci_n">Descripción</string>
+    <string name="toca_para_subir_foto_de_perfil">Toca para subir foto de perfil</string>
+    <string name="lista_de_lbumes">Lista de Álbumes</string>
+    <string name="agregar_lbum">Agregar Álbum</string>
+    <string name="lista_de_premios">Lista de Premios</string>
+    <string name="agregar_premio">Agregar Premio</string>
+    <string name="crear_artista">Crear Artista</string>
+    <string name="comentarios_de_usuarios">Comentarios de usuarios</string>
+    <string name="a_n_no_hay_comentarios_disponibles">Aún no hay comentarios disponibles.</string>
+    <string name="error_de_conexi_n">Error de conexión</string>
+    <string name="reintentar">Reintentar</string>
+    <string name="rock_band_new_york">Rock Band · New York</string>
+    <string name="lbumes">Álbumes</string>
+    <string name="grammy_awards">Grammy Awards</string>
+    <string name="nacimiento">Nacimiento</string>
+    <string name="no_hay_lbumes_disponibles">No hay álbumes disponibles</string>
+    <string name="premios">Premios</string>
+    <string name="no_hay_premios_asignados">No hay premios asignados</string>
+    <string name="buscar_lbumes">Buscar álbumes...</string>
+    <string name="pantalla_de_perfil">Pantalla de Perfil</string>
+    <string name="album_name">Album Name</string>
+    <string name="artist_name">Artist Name</string>
+    <string name="usuario">Usuario</string>
+    <string name="duraci_n">Duración</string>
 
 
     <!-- Favorites screen -->

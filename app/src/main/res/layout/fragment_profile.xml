@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white_background"
     android:orientation="vertical"
     android:gravity="center"
     android:padding="16dp">
@@ -13,7 +12,7 @@
         android:id="@+id/tvProfileTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pantalla de Perfil"
+        android:text="@string/pantalla_de_perfil"
         android:textAppearance="?attr/textAppearanceHeadline6"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

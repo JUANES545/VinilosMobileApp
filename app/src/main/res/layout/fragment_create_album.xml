@@ -29,7 +29,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Nombre del Album">
+                android:hint="@string/nombre_del_album">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/input_album_name"
@@ -44,7 +44,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Año de Lanzamiento">
+                android:hint="@string/a_o_de_lanzamiento">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/input_album_year"
@@ -60,7 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Selecciona un género"
+                android:hint="@string/selecciona_un_g_nero"
                 app:endIconMode="dropdown_menu">
 
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -78,7 +78,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Selecciona un sello discográfico"
+                android:hint="@string/selecciona_un_sello_discogr_fico"
                 app:endIconMode="dropdown_menu">
 
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -96,7 +96,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Descripción (opcional)">
+                android:hint="@string/descripci_n_opcional">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/input_album_description"
@@ -109,7 +109,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Imagen del Álbum"
+                android:text="@string/imagen_del_lbum"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -133,13 +133,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Toca para subir una imagen"
+                    android:text="@string/toca_para_subir_una_imagen"
                     android:textColor="?attr/colorOnSurface" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="PNG, JPG hasta 5MB"
+                    android:text="@string/png_jpg_hasta_5mb"
                     android:textColor="?attr/colorOnSurface"
                     android:textSize="12sp"
                     android:visibility="gone" />
@@ -150,7 +150,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Lista de Canciones"
+                android:text="@string/lista_de_canciones"
                 android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -166,7 +166,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Agregar Canción"
+                android:text="@string/agregar_canci_n"
                 android:textAllCaps="false"
                 app:icon="@drawable/ic_add"
                 app:iconGravity="textStart" />
@@ -176,7 +176,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Comentarios Iniciales"
+                android:text="@string/comentarios_iniciales"
                 android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -193,7 +193,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="26dp"
-                android:text="Agregar Comentario"
+                android:text="@string/agregar_comentario"
                 android:textAllCaps="false"
                 app:icon="@drawable/ic_add"
                 app:iconGravity="textStart" />
@@ -209,7 +209,7 @@
         android:layout_marginHorizontal="26dp"
         android:backgroundTint="?attr/colorPrimary"
         android:padding="16dp"
-        android:text="Crear Álbum"
+        android:text="@string/crear_lbum"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

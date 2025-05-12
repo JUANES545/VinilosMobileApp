@@ -14,7 +14,6 @@ class DetailAlbumViewModel : ViewModel() {
     val albumDetail: LiveData<AlbumDetail?> get() = _albumDetail
 
     private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> get() = _isLoading
 
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> get() = _errorMessage

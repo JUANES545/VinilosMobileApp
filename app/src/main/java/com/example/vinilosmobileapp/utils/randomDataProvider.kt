@@ -24,14 +24,6 @@ object RandomDataProvider {
         "Shape of You"
     )
 
-    val guestNames = listOf(
-        "Melómano Anónimo",
-        "Oyente Misterioso",
-        "Amante del Vinilo",
-        "Coleccionista X",
-        "Música para el alma"
-    )
-
     val genreOptions = listOf("Classical", "Salsa", "Rock", "Folk")
 
     val recordLabels = listOf(

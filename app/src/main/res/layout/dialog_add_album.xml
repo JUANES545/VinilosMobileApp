@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
-        android:hint="Álbum">
+        android:hint="@string/lbum">
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
             android:id="@+id/dropdown_album"
@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
         android:layout_marginTop="8dp"
-        android:text="No hay álbums que mostrar"
+        android:text="@string/no_hay_lbums_que_mostrar"
         android:textColor="@color/black"
         android:textSize="12sp"
         android:visibility="visible" />

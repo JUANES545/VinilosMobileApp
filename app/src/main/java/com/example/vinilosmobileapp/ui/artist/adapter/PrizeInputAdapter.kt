@@ -1,5 +1,6 @@
 package com.example.vinilosmobileapp.ui.artist.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -37,6 +38,7 @@ class PrizeInputAdapter(
         notifyItemInserted(performerPrizes.lastIndex)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updatePrizes(newPrizes: List<Prize>) {
         prizes = newPrizes
         notifyDataSetChanged()
