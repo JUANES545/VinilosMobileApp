@@ -3,17 +3,17 @@
     <item
         android:id="@+id/homeFragment"
         android:icon="@drawable/ic_album"
-        android:title="Álbumes" />
+        android:title="@string/title_albums" />
     <item
         android:id="@+id/artistFragment"
         android:icon="@drawable/ic_artists"
-        android:title="Artistas" />
+        android:title="@string/title_artists" />
     <item
-        android:id="@+id/favoritesFragment"
+        android:id="@+id/collectorsFragment"
         android:icon="@drawable/ic_favorite"
-        android:title="Favoritos" />
+        android:title="@string/title_collectors" />
     <item
         android:id="@+id/profileFragment"
         android:icon="@drawable/ic_profile"
-        android:title="Perfil" />
+        android:title="@string/title_profile" />
 </menu>

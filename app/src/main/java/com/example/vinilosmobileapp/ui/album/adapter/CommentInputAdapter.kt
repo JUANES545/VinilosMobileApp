@@ -1,5 +1,6 @@
 package com.example.vinilosmobileapp.ui.album.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -11,6 +12,7 @@ class CommentInputAdapter(private var comments: List<Comment>) :
 
     inner class CommentViewHolder(private val binding: ItemCommentBinding) :
         RecyclerView.ViewHolder(binding.root) {
+        @SuppressLint("SetTextI18n")
         fun bind(comment: Comment) {
             binding.commentDescription.text = comment.description
             binding.commentAuthor.text = "- ${comment.collector?.name ?: "Anónimo"}"
@@ -28,6 +30,7 @@ class CommentInputAdapter(private var comments: List<Comment>) :
 
     override fun getItemCount(): Int = comments.size
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateComments(newComments: List<Comment>) {
         comments = newComments
         notifyDataSetChanged()

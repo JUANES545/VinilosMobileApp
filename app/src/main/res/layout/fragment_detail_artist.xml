@@ -81,7 +81,7 @@
                             android:id="@+id/tvRoleLocation"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Rock Band · New York"
+                            android:text="@string/rock_band_new_york"
                             android:textColor="@android:color/darker_gray"
                             android:textSize="14sp" />
                     </LinearLayout>
@@ -95,7 +95,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginBottom="4dp"
-                android:text="Descripción"
+                android:text="@string/descripci_n"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -136,7 +136,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Álbumes"
+                        android:text="@string/lbumes"
                         android:textColor="@android:color/darker_gray"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -166,7 +166,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Grammy Awards"
+                        android:text="@string/grammy_awards"
                         android:textColor="@android:color/darker_gray"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -194,7 +194,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Nacimiento"
+                        android:text="@string/nacimiento"
                         android:textColor="@android:color/darker_gray"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -206,7 +206,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginBottom="8dp"
-                android:text="Álbumes"
+                android:text="@string/lbumes"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -223,7 +223,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginVertical="24dp"
-                android:text="No hay álbumes disponibles"
+                android:text="@string/no_hay_lbumes_disponibles"
                 android:textSize="16sp"
                 android:visibility="gone" />
 
@@ -234,7 +234,7 @@
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginBottom="8dp"
                 android:orientation="horizontal"
-                android:text="Premios"
+                android:text="@string/premios"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -249,7 +249,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginVertical="24dp"
-                android:text="No hay premios asignados"
+                android:text="@string/no_hay_premios_asignados"
                 android:textSize="16sp"
                 android:visibility="gone" />
 

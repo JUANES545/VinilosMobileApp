@@ -7,6 +7,7 @@
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/artistContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="16dp"
@@ -24,40 +25,15 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0" />
 
-        <!-- Estado vacío / error -->
-        <LinearLayout
-            android:id="@+id/errorLayoutArtist"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center"
-            android:orientation="vertical"
+        <include
+            android:id="@+id/errorLayout"
+            layout="@layout/layout_error_state"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:id="@+id/imageErrorArtist"
-                android:layout_width="wrap_content"
-                android:layout_height="250dp"
-                android:src="@drawable/ic_no_connection" />
-
-            <TextView
-                android:id="@+id/textErrorArtist"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Error al cargar artistas"
-                android:textSize="18sp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonRetryArtist"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Reintentar" />
-        </LinearLayout>
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_add_artist"
@@ -82,8 +58,9 @@
             app:layout_anchor="@id/recyclerViewArtists"
             app:layout_anchorGravity="bottom|end"
             app:layout_constraintBottom_toTopOf="@+id/fab_add_artist"
-            app:layout_constraintEnd_toEndOf="@+id/recyclerViewArtists"
+            app:layout_constraintEnd_toEndOf="@+id/artistContainer"
             app:srcCompat="@drawable/ic_star_filled"
-            app:tint="@color/gold" />
+            app:tint="@color/gold"
+            tools:ignore="ContentDescription" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

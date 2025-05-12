@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -21,7 +20,7 @@
                 android:id="@+id/albumImage"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:contentDescription="Imagen del álbum"
+                android:contentDescription="@string/imagen_del_lbum"
                 android:scaleType="centerCrop" />
 
             <!-- Nombre del Álbum -->
@@ -56,7 +55,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
-                android:text="Descripción"
+                android:text="@string/descripci_n"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -72,7 +71,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="Lista de canciones"
+                android:text="@string/lista_de_canciones"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -90,7 +89,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="Comentarios de usuarios"
+                android:text="@string/comentarios_de_usuarios"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -99,7 +98,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Aún no hay comentarios disponibles."
+                android:text="@string/a_n_no_hay_comentarios_disponibles"
                 android:textSize="14sp"
                 android:visibility="gone" />
 
@@ -117,7 +116,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
-                android:text="Agregar comentario"
+                android:text="@string/agregar_comentario"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:visibility="gone" />
@@ -139,7 +138,7 @@
             android:id="@+id/imageError"
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:contentDescription="Error de conexión"
+            android:contentDescription="@string/error_de_conexi_n"
             android:src="@drawable/ic_no_connection" />
 
         <TextView
@@ -147,7 +146,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Error de conexión"
+            android:text="@string/error_de_conexi_n"
             android:textAlignment="center"
             android:textSize="16sp" />
 
@@ -156,6 +155,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Reintentar" />
+            android:text="@string/reintentar" />
     </LinearLayout>
 </FrameLayout>

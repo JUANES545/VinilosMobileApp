@@ -16,7 +16,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:hint="Buscar álbumes..."
+            android:hint="@string/buscar_lbumes"
             app:boxBackgroundMode="outline"
             app:boxCornerRadiusBottomEnd="24dp"
             app:boxCornerRadiusBottomStart="24dp"
@@ -52,61 +52,22 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/search_input_layout" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:orientation="vertical"
+        <include
+            android:id="@+id/errorLayout"
+            layout="@layout/layout_error_state"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/recyclerView_albums">
-
-            <!-- Imagen de error de red -->
-            <ImageView
-                android:id="@+id/image_error"
-                android:layout_width="wrap_content"
-                android:layout_height="250dp"
-                android:src="@drawable/ic_no_connection"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:ignore="ContentDescription" />
-
-            <!-- Mensaje de error -->
-            <TextView
-                android:id="@+id/text_error"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Error de conexión"
-                android:textSize="18sp"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/image_error" />
-
-            <!-- Botón de reintentar -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_retry"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Reintentar"
-                android:visibility="gone"
-                app:cornerRadius="16dp"
-                app:iconGravity="textStart"
-                app:iconPadding="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text_error" />
-        </LinearLayout>
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_create_album"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:contentDescription="Crear álbum"
+            android:contentDescription="@string/crear_lbum"
             android:src="@drawable/ic_add"
             app:backgroundTint="@color/purple_500"
             app:layout_constraintBottom_toBottomOf="parent"

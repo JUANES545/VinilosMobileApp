@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/errorContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/imageError"
+        android:layout_width="wrap_content"
+        android:layout_height="250dp"
+        android:src="@drawable/ic_no_connection"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/textError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        tools:text="Error de conexión" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonRetry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:visibility="gone"
+        app:backgroundTint="@android:color/holo_red_light"
+        app:cornerRadius="16dp"
+        app:iconGravity="textStart"
+        app:iconPadding="8dp"
+        android:text="@string/error_retry"
+        tools:visibility="visible" />
+</LinearLayout>

@@ -91,16 +91,5 @@ dependencies {
     implementation(libs.retrofit.converter.gson)
     implementation(libs.retrofit.converter.scalars)
 
-    // Test JUnit
-    debugImplementation("androidx.fragment:fragment-testing:1.4.0")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.6.1")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test:runner:1.6.2")
-    androidTestImplementation("org.hamcrest:hamcrest:2.2")
-
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.hamcrest:hamcrest-library:2.2")
-
 
 }

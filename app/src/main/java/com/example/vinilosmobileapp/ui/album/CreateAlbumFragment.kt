@@ -64,7 +64,7 @@ class CreateAlbumFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         (requireActivity() as AppCompatActivity).supportActionBar?.title =
-            getString(R.string.create_new_album)
+            getString(R.string.album_create_new)
 
         setupDropdowns()
         setupYearPicker()
@@ -196,9 +196,7 @@ class CreateAlbumFragment : Fragment() {
             name = name,
             cover = coverUrl,
             releaseDate = releaseDateFormatted,
-            description = if (description.isEmpty())
-                "Álbum creado desde la app móvil."
-            else description,
+            description = description.ifEmpty { "Álbum creado desde la app móvil." },
             genre = genre,
             recordLabel = artist
         )
@@ -302,114 +300,6 @@ class CreateAlbumFragment : Fragment() {
         }
     }
 
-    private fun sendComments(albumId: Int, onError: () -> Unit): Int {
-        val comments = commentInputAdapter.getComments()
-        if (comments.isEmpty()) return 0
-
-        var pendingRequests = comments.size
-
-        // Si no hay collectors, creamos uno Guest antes de enviar los comentarios
-        if (currentCollectors.isEmpty()) {
-            Log.w("CreateAlbum", "⚠️ No hay collectors disponibles, creando Guest...")
-            createGuestCollector { guestId ->
-                Log.i("CreateAlbum", "✅ Guest disponible con ID: $guestId, enviando comentarios...")
-                comments.forEach { comment ->
-                    sendSingleComment(albumId, comment, guestId, onError) { hasError ->
-                        pendingRequests--
-                        checkPendingRequests(pendingRequests, hasError)
-                    }
-                }
-            }
-        } else {
-            // Ya hay collectors: usamos el ID del comment o el primero disponible
-            val defaultCollectorId = currentCollectors.first().id
-            comments.forEach { comment ->
-                val collectorId = comment.collector?.id ?: defaultCollectorId
-                sendSingleComment(albumId, comment, collectorId, onError) { hasError ->
-                    pendingRequests--
-                    checkPendingRequests(pendingRequests, hasError)
-                }
-            }
-        }
-
-        return comments.size
-    }
-
-    private fun sendSingleComment(
-        albumId: Int,
-        comment: Comment,
-        collectorId: Int,
-        onError: () -> Unit,
-        onComplete: (hasError: Boolean) -> Unit
-    ) {
-        val commentDTO = CommentCreateDTO(
-            description = comment.description,
-            rating = comment.rating,
-            collector = CollectorReferenceDTO(collectorId)
-        )
-
-        AlbumServiceAdapter.addCommentToAlbum(albumId, commentDTO)
-            .enqueue(object : Callback<Void> {
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                    if (!response.isSuccessful) {
-                        onError()
-                        Log.e(
-                            "CreateAlbum",
-                            "❌ Error al crear comentario: ${response.code()} - ${
-                                response.errorBody()?.string()
-                            }"
-                        )
-                        onComplete(true)
-                    } else {
-                        onComplete(false)
-                    }
-                }
-
-                override fun onFailure(call: Call<Void>, t: Throwable) {
-                    onError()
-                    Log.e(
-                        "CreateAlbum",
-                        "❌ Error de red al crear comentario: ${t.localizedMessage}"
-                    )
-                    onComplete(true)
-                }
-            })
-    }
-
-    private fun sendTracks(albumId: Int, onError: () -> Unit): Int {
-        var pendingRequests = 0
-
-        for (track in trackInputAdapter.getTracks()) {
-            pendingRequests++
-            val trackDTO =
-                TrackCreateDTO(name = track.name, duration = track.duration ?: "3:30 min")
-            AlbumServiceAdapter.addTrackToAlbum(albumId, trackDTO).enqueue(object : Callback<Void> {
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                    pendingRequests--
-                    if (!response.isSuccessful) {
-                        onError()
-                        Log.e(
-                            "CreateAlbum",
-                            "❌ Error al crear track: ${response.code()} - ${
-                                response.errorBody()?.string()
-                            }"
-                        )
-                    }
-                    checkPendingRequests(pendingRequests, hasErrors = false)
-                }
-
-                override fun onFailure(call: Call<Void>, t: Throwable) {
-                    pendingRequests--
-                    onError()
-                    Log.e("CreateAlbum", "❌ Error de red al crear track: ${t.localizedMessage}")
-                    checkPendingRequests(pendingRequests, hasErrors = true)
-                }
-            })
-        }
-
-        return pendingRequests
-    }
-
     private fun checkPendingRequests(pending: Int, hasErrors: Boolean) {
         if (!isAdded) return
         if (pending == 0) {
@@ -470,10 +360,10 @@ class CreateAlbumFragment : Fragment() {
                 call: Call<List<Collector>>,
                 response: Response<List<Collector>>
             ) {
-                if (response.isSuccessful) {
-                    currentCollectors = response.body() ?: emptyList()
+                currentCollectors = if (response.isSuccessful) {
+                    response.body() ?: emptyList()
                 } else {
-                    currentCollectors = emptyList()
+                    emptyList()
                 }
             }
 

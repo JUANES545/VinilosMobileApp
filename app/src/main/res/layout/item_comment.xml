@@ -19,7 +19,7 @@
             android:id="@+id/commentDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Comentario..."
+            android:text="@string/comentario"
             android:textSize="14sp" />
 
         <TextView
@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Usuario"
+            android:text="@string/usuario"
             android:textColor="@android:color/darker_gray"
             android:textSize="12sp" />
     </LinearLayout>
