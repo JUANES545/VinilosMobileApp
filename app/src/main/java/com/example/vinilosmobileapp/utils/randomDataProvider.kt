@@ -82,6 +82,11 @@ object RandomDataProvider {
         "Innovador constante, siempre explorando nuevos horizontes musicales y desafiando los límites creativos."
     )
 
+    val guestNames = listOf(
+        "Melómano Anónimo", "Oyente Misterioso", "Amante del Vinilo",
+        "Coleccionista X", "Música para el alma"
+    )
+
     fun randomDuration(): String {
         return "${(2..7).random()}:${(0..59).random().toString().padStart(2, '0')} min"
     }

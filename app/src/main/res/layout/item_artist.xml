@@ -24,8 +24,8 @@
                 android:id="@+id/imageViewArtist"
                 android:layout_width="match_parent"
                 android:layout_height="160dp"
-                android:scaleType="centerCrop"
-                tools:ignore="ContentDescription" />
+                android:contentDescription="@string/imagen_que_muestra_la_imagen_del_artista_o_grupo_musical"
+                android:scaleType="centerCrop" />
         </com.facebook.shimmer.ShimmerFrameLayout>
 
         <!-- Favorite Button -->
@@ -42,9 +42,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/icono_de_estrella_que_indica_lista_de_favoritos"
                 android:src="@drawable/selector_favorite"
-                android:stateListAnimator="@android:anim/overshoot_interpolator"
-                tools:ignore="ContentDescription" />
+                android:stateListAnimator="@android:anim/overshoot_interpolator" />
         </FrameLayout>
 
         <!-- Artist Details -->
