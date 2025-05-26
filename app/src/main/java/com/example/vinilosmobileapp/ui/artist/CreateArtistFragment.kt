@@ -70,12 +70,18 @@ class CreateArtistFragment : Fragment() {
 
         vm.createResult.observe(viewLifecycleOwner) { success ->
             if (success) {
-                Toast.makeText(requireContext(), "Artista creado", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.artista_creado), Toast.LENGTH_SHORT
+                ).show()
                 sendAlbumDataComplements()
                 setFragmentResult("artist_created", Bundle())
                 findNavController().popBackStack()
             } else {
-                Toast.makeText(requireContext(), "Error al crear artista", Toast.LENGTH_SHORT)
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.error_al_crear_artista), Toast.LENGTH_SHORT
+                )
                     .show()
             }
         }
@@ -97,22 +103,18 @@ class CreateArtistFragment : Fragment() {
                 birthDate = sdf.format(cal.time),
                 description = binding.etDesc.text.toString().trim()
             )
-            // Step 1: Send artist data to the server
             vm.createArtist(dto)
         }
     }
 
     private fun sendAlbumDataComplements() {
-        // Step 2: Observe the result and send albums/prizes if lists are not empty
         val createdArtistId = vm.getCreatedArtistId()
 
-        // Send albums if the list is not empty
         val selectedAlbums = albumAdapter.getSelectedAlbums()
         if (selectedAlbums.isNotEmpty() && createdArtistId != null) {
             vm.addAlbumsToArtist(createdArtistId, selectedAlbums)
         }
 
-        // Send prizes if the list is not empty
         val selectedPrizes = prizeInputAdapter.getSelectedPrizes()
         if (selectedPrizes.isNotEmpty() && createdArtistId != null) {
             vm.addPrizesToArtist(createdArtistId, selectedPrizes)
@@ -124,21 +126,21 @@ class CreateArtistFragment : Fragment() {
         listOf(binding.tilName, binding.tilBirth, binding.tilDesc).forEach { it.error = null }
 
         if (binding.etName.text.isNullOrBlank()) {
-            binding.tilName.error = "Nombre obligatorio"; valid = false
+            binding.tilName.error = getString(R.string.nombre_obligatorio); valid = false
         }
         if (binding.etBirth.text.isNullOrBlank()) {
-            binding.tilBirth.error = "Fecha de nacimiento requerida"; valid = false
+            binding.tilBirth.error = getString(R.string.fecha_de_nacimiento_requerida); valid =
+                false
         }
         if (binding.etDesc.text.isNullOrBlank()) {
-            binding.tilDesc.error = "Descripción requerida"; valid = false
+            binding.tilDesc.error = getString(R.string.descripci_n_requerida); valid = false
         }
         return valid
     }
 
     private fun setupAdapters() {
-        // Reutilizamos el AlbumAdapter de la carpeta home
         albumAdapter = AlbumAdapter(emptyList()) { albumId ->
-            Toast.makeText(requireContext(), "Álbum seleccionado: $albumId", Toast.LENGTH_SHORT)
+            Toast.makeText(requireContext(), "$albumId", Toast.LENGTH_SHORT)
                 .show()
         }
 
@@ -147,11 +149,9 @@ class CreateArtistFragment : Fragment() {
             adapter = albumAdapter
         }
 
-        // Initialize PrizeInputAdapter with performerPrizes and prizes
-        val performerPrizes = mutableListOf<PerformerPrize>() // Replace with actual data
-       // val prizes = vm.prizes.value ?: emptyList() // Fetch prizes from ViewModel
-        vm.fetchPrizes() // Fetch prizes from ViewModel
-        val prizes = vm.prizes.value ?: emptyList() // Fetch prizes from ViewModel
+        val performerPrizes = mutableListOf<PerformerPrize>()
+        vm.fetchPrizes()
+        val prizes = vm.prizes.value ?: emptyList()
         prizeInputAdapter = PrizeInputAdapter(performerPrizes, prizes)
 
         binding.recyclerViewPrizes.apply {

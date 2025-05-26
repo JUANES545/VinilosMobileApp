@@ -126,8 +126,8 @@
                     android:id="@+id/image_preview"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
-                    android:src="@drawable/ic_image_placeholder"
-                    tools:ignore="ContentDescription" />
+                    android:contentDescription="@string/imagen_que_previsualiza_la_portada_del_album"
+                    android:src="@drawable/ic_image_placeholder" />
 
                 <TextView
                     android:layout_width="wrap_content"

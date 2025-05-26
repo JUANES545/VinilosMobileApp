@@ -113,7 +113,7 @@ class ArtistFragment : Fragment() {
                     binding.swipeRefreshArtist,
                     binding.recyclerViewArtists,
                     binding.errorLayout.errorContainer,
-                    errorMessage = "Error de conexión\n\n$error",
+                    errorMessage = "${getString(R.string.error_de_conexi_n)}\n\n$error",
                     errorIconRes = R.drawable.ic_no_connection
                 )
             }
@@ -155,7 +155,8 @@ class ArtistFragment : Fragment() {
     }
 
     private fun applyFilter() {
-        val title = if (showingFavorites) "Artistas Favoritos" else "Todos los Artistas"
+        val title = if (showingFavorites) getString(R.string.artistas_favoritos) else
+            getString(R.string.todos_los_artistas)
         val spannableTitle = SpannableString(title).apply {
             if (showingFavorites) {
                 setSpan(

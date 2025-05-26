@@ -78,12 +78,18 @@ class CreateAlbumFragment : Fragment() {
 
         viewModel.createAlbumResult.observe(viewLifecycleOwner) { success ->
             if (success) {
-                Toast.makeText(requireContext(), "Álbum creado exitosamente", Toast.LENGTH_LONG)
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.lbum_creado_exitosamente), Toast.LENGTH_LONG
+                )
                     .show()
                 parentFragmentManager.setFragmentResult("album_created", Bundle())
                 requireActivity().onBackPressedDispatcher.onBackPressed()
             } else {
-                Toast.makeText(requireContext(), "Error al crear el álbum", Toast.LENGTH_LONG)
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.error_al_crear_el_lbum), Toast.LENGTH_LONG
+                )
                     .show()
             }
         }
@@ -113,7 +119,7 @@ class CreateAlbumFragment : Fragment() {
 
         binding.inputAlbumYear.setOnClickListener {
             MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Selecciona el año de lanzamiento")
+                .setTitle(getString(R.string.selecciona_el_a_o_de_lanzamiento))
                 .setItems(years) { dialog, which ->
                     binding.inputAlbumYear.setText(years[which])
                     dialog.dismiss()
@@ -166,71 +172,68 @@ class CreateAlbumFragment : Fragment() {
         binding.dropdownArtistLayout.error = null
 
         if (name.isEmpty()) {
-            binding.inputAlbumNameLayout.error = "Este campo es obligatorio"
+            binding.inputAlbumNameLayout.error = getString(R.string.este_campo_es_obligatorio)
             isValid = false
         }
         if (year.isEmpty()) {
-            binding.inputAlbumYearLayout.error = "Este campo es obligatorio"
+            binding.inputAlbumYearLayout.error = getString(R.string.este_campo_es_obligatorio)
             isValid = false
         }
         if (genre.isEmpty()) {
-            binding.dropdownGenreLayout.error = "Selecciona un género"
+            binding.dropdownGenreLayout.error = getString(R.string.selecciona_un_g_nero)
             isValid = false
         }
         if (artist.isEmpty()) {
-            binding.dropdownArtistLayout.error = "Selecciona un sello discográfico"
+            binding.dropdownArtistLayout.error =
+                getString(R.string.selecciona_un_sello_discogr_fico)
             isValid = false
         }
 
         if (!isValid) {
-            Log.e("CreateAlbum", "❌ Validación fallida: Campos obligatorios vacíos")
+            Log.e("CreateAlbum", getString(R.string.validaci_n_fallida_campos_obligatorios_vac_os))
             return
         }
 
         val coverUrl = selectedCoverUrl ?: "https://http.cat/images/102.jpg"
         val description = binding.inputAlbumDescription.text?.toString()?.trim()
-            ?: "Álbum creado desde la app móvil."
+            ?: getString(R.string.lbum_creado_desde_la_app_m_vil)
         val releaseDateFormatted = "$year-01-01"
 
         val albumCreateDTO = AlbumCreateDTO(
             name = name,
             cover = coverUrl,
             releaseDate = releaseDateFormatted,
-            description = description.ifEmpty { "Álbum creado desde la app móvil." },
+            description = description.ifEmpty { getString(R.string.lbum_creado_desde_la_app_m_vil) },
             genre = genre,
             recordLabel = artist
         )
-
-        Log.d("CreateAlbum", "🚀 Creando álbum: $albumCreateDTO")
 
         AlbumServiceAdapter.createAlbum(albumCreateDTO).enqueue(object : Callback<Album> {
             override fun onResponse(call: Call<Album>, response: Response<Album>) {
                 if (response.isSuccessful) {
                     val createdAlbum = response.body()
                     if (createdAlbum != null) {
-                        Log.i("CreateAlbum", "✅ Álbum creado con ID: ${createdAlbum.id}")
                         sendCommentsAndTracks(createdAlbum.id)
                     }
                 } else {
                     Log.e(
                         "CreateAlbum",
-                        "❌ Error al crear álbum: ${response.code()} - ${
+                        "❌ Error: ${response.code()} - ${
                             response.errorBody()?.string()
                         }"
                     )
                     Toast.makeText(
                         requireContext(),
-                        "Error al crear el álbum",
+                        getString(R.string.error_al_crear_el_lbum),
                         Toast.LENGTH_LONG
                     ).show()
                 }
             }
 
             override fun onFailure(call: Call<Album>, t: Throwable) {
-                Log.e("CreateAlbum", "❌ Error de red al crear álbum: ${t.localizedMessage}")
                 Toast.makeText(
                     requireContext(),
-                    "Error de red al crear el álbum",
+                    getString(R.string.error_de_red_al_crear_el_lbum),
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -243,22 +246,18 @@ class CreateAlbumFragment : Fragment() {
         var totalPending = comments.size + tracks.size
         var hasErrors = false
 
-        // Si no hay nada que enviar, volvemos ya
         if (totalPending == 0) {
             checkPendingRequests(0, false)
             return
         }
 
-        // Helpers para decrementar y comprobar
         fun onCompleteSingle(error: Boolean) {
             totalPending--
             if (error) hasErrors = true
             checkPendingRequests(totalPending, hasErrors)
         }
 
-        // 1) comments
         comments.forEach { comment ->
-            // Si no hay collectors, crea uno antes de enviar
             val sendWithCollector: (Int) -> Unit = { collectorId ->
                 val dto = CommentCreateDTO(
                     description = comment.description,
@@ -286,7 +285,7 @@ class CreateAlbumFragment : Fragment() {
 
         // 2) tracks
         tracks.forEach { track ->
-            val dto = TrackCreateDTO(track.name, track.duration ?: "3:30 min")
+            val dto = TrackCreateDTO(track.name, track.duration ?: getString(R.string._3_30_min))
             AlbumServiceAdapter.addTrackToAlbum(albumId, dto)
                 .enqueue(object : Callback<Void> {
                     override fun onResponse(call: Call<Void>, resp: Response<Void>) {
@@ -306,13 +305,13 @@ class CreateAlbumFragment : Fragment() {
             if (hasErrors) {
                 Toast.makeText(
                     requireContext(),
-                    "Álbum creado, pero hubo errores al agregar contenido",
+                    getString(R.string.lbum_creado_pero_hubo_errores_al_agregar_contenido),
                     Toast.LENGTH_LONG
                 ).show()
             } else {
                 Toast.makeText(
                     requireContext(),
-                    "Álbum y contenido creado exitosamente",
+                    getString(R.string.lbum_y_contenido_creado_exitosamente),
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -333,21 +332,17 @@ class CreateAlbumFragment : Fragment() {
                 if (response.isSuccessful) {
                     val guest = response.body()
                     if (guest != null) {
-                        Log.i("CreateAlbum", "✅ Guest creado con ID: ${guest.id}")
                         onGuestCreated(guest.id)
                     } else {
-                        Log.e("CreateAlbum", "❌ Error creando guest: cuerpo vacío")
                         onGuestCreated(currentCollectors.firstOrNull()?.id ?: 1)
                     }
                 } else {
                     val err = response.errorBody()?.string()
-                    Log.e("CreateAlbum", "❌ Error creando guest: ${response.code()} - $err")
                     onGuestCreated(currentCollectors.firstOrNull()?.id ?: 1)
                 }
             }
 
             override fun onFailure(call: Call<Collector>, t: Throwable) {
-                Log.e("CreateAlbum", "❌ Error de red creando guest: ${t.localizedMessage}")
                 onGuestCreated(currentCollectors.firstOrNull()?.id ?: 1)
             }
         })
@@ -393,7 +388,6 @@ class CreateAlbumFragment : Fragment() {
         val guestHint = dialogView.findViewById<TextView>(R.id.guest_hint)
         inputComment.setText(randomComments.random())
 
-        // 🔵 Configurar Dropdown con los collectors
         val collectorsNames = currentCollectors.map { it.name }
         if (collectorsNames.isNotEmpty()) {
             val adapter =
@@ -408,9 +402,9 @@ class CreateAlbumFragment : Fragment() {
             guestHint.visibility = View.VISIBLE
         }
 
-        builder.setTitle("Agregar Comentario")
-            .setPositiveButton("Agregar", null) // Validación manual después
-            .setNegativeButton("Cancelar", null)
+        builder.setTitle(getString(R.string.agregar_comentario))
+            .setPositiveButton(getString(R.string.agregar), null)
+            .setNegativeButton(getString(R.string.cancelar), null)
 
         val dialog = builder.create()
         dialog.show()
@@ -420,7 +414,7 @@ class CreateAlbumFragment : Fragment() {
                 val commentText = inputComment.text?.toString()?.trim() ?: ""
 
                 if (commentText.isEmpty()) {
-                    inputCommentLayout.error = "El comentario es obligatorio"
+                    inputCommentLayout.error = getString(R.string.el_comentario_es_obligatorio)
                     return@setOnClickListener
                 } else {
                     inputCommentLayout.error = null
@@ -429,14 +423,13 @@ class CreateAlbumFragment : Fragment() {
                 val selectedAuthor = inputCollector.text?.toString()?.trim()
 
                 val selectedCollector = currentCollectors.find { it.name == selectedAuthor }
-                val collectorId = selectedCollector?.id ?: 1 // Default ID 1 si no existe
+                val collectorId = selectedCollector?.id ?: 1
                 val authorName = if (!selectedAuthor.isNullOrEmpty()) {
                     selectedAuthor
                 } else {
-                    "Anónimo"
+                    getString(R.string.an_nimo)
                 }
 
-                // Crear el comentario
                 val comment = Comment(
                     id = 0,
                     description = commentText,
@@ -465,9 +458,9 @@ class CreateAlbumFragment : Fragment() {
         inputTrackDuration.setText(randomDuration())
 
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Agregar Canción")
+            .setTitle(getString(R.string.agregar_canci_n))
             .setView(dialogView)
-            .setPositiveButton("Agregar") { _, _ ->
+            .setPositiveButton(getString(R.string.agregar)) { _, _ ->
                 val trackName = inputTrackName.text.toString().trim()
                 val trackDuration =
                     inputTrackDuration.text.toString().trim().ifEmpty { null }
@@ -478,7 +471,7 @@ class CreateAlbumFragment : Fragment() {
                     )
                 }
             }
-            .setNegativeButton("Cancelar", null)
+            .setNegativeButton(getString(R.string.cancelar), null)
             .show()
     }
 

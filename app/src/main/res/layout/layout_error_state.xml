@@ -12,8 +12,8 @@
         android:id="@+id/imageError"
         android:layout_width="wrap_content"
         android:layout_height="250dp"
-        android:src="@drawable/ic_no_connection"
-        tools:ignore="ContentDescription" />
+        android:contentDescription="@string/imagen_que_indica_error_al_mostrar_el_contenido_de_la_p_gina"
+        android:src="@drawable/ic_no_connection" />
 
     <TextView
         android:id="@+id/textError"
@@ -29,11 +29,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:text="@string/error_retry"
         android:visibility="gone"
         app:backgroundTint="@android:color/holo_red_light"
         app:cornerRadius="16dp"
         app:iconGravity="textStart"
         app:iconPadding="8dp"
-        android:text="@string/error_retry"
         tools:visibility="visible" />
 </LinearLayout>

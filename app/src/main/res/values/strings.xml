@@ -72,9 +72,45 @@
     <string name="artist_name">Artist Name</string>
     <string name="usuario">Usuario</string>
     <string name="duraci_n">Duración</string>
-
-
-    <!-- Favorites screen -->
-
+    <string name="imagen_que_indica_error_al_mostrar_el_contenido_de_la_p_gina">Imagen que indica error al mostrar el contenido de la página</string>
+    <string name="imagen_que_muestra_la_imagen_del_artista_o_grupo_musical">Imagen que muestra la imagen del artista o grupo musical</string>
+    <string name="imagen_que_muestra_la_foto_de_portada_del_album_corespondiente">imagen que muestra la foto de portada del album corespondiente</string>
+    <string name="imagen_de_referencia_para_indicar_que_se_puede_hacer_click_para_subir_una_imagen_de_artista">Imagen de referencia para indicar que se puede hacer click para subir una imagen de artista</string>
+    <string name="icono_de_estrella_que_indica_lista_de_favoritos">Icono de estrella, que indica lista de favoritos</string>
+    <string name="bot_n_que_indica_que_se_puede_agregar_un_artista_nuevo_con_el_icono_de">Botón que indica que se puede agregar un artista nuevo con el icono de +</string>
+    <string name="bot_n_que_indica_que_se_puede_filtrar_los_artistas_favoritos_con_el_icono_de_una_estrella">Botón que indica que se puede filtrar los artistas favoritos, con el icono de una estrella</string>
+    <string name="imagen_que_previsualiza_la_portada_del_album">Imagen que previsualiza la portada del album</string>
+    <string name="imagen_que_muestra_la_foto_de_perfil_del_usuario">imagen que muestra la foto de perfil del usuario</string>
+    <string name="selecciona_el_a_o_de_lanzamiento">Selecciona el año de lanzamiento</string>
+    <string name="lbum_creado_exitosamente">Álbum creado exitosamente</string>
+    <string name="error_al_crear_el_lbum">Error al crear el álbum</string>
+    <string name="este_campo_es_obligatorio">Este campo es obligatorio</string>
+    <string name="validaci_n_fallida_campos_obligatorios_vac_os">❌ Validación fallida: Campos obligatorios vacíos</string>
+    <string name="lbum_creado_desde_la_app_m_vil">Álbum creado desde la app móvil.</string>
+    <string name="error_de_red_al_crear_el_lbum">Error de red al crear el álbum</string>
+    <string name="_3_30_min">3:30 min</string>
+    <string name="lbum_creado_pero_hubo_errores_al_agregar_contenido">Álbum creado, pero hubo errores al agregar contenido</string>
+    <string name="lbum_y_contenido_creado_exitosamente">Álbum y contenido creado exitosamente</string>
+    <string name="agregar">Agregar</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="el_comentario_es_obligatorio">El comentario es obligatorio</string>
+    <string name="an_nimo">Anónimo</string>
+    <string name="artista_creado">Artista creado</string>
+    <string name="error_al_crear_artista">Error al crear artista</string>
+    <string name="nombre_obligatorio">Nombre obligatorio</string>
+    <string name="fecha_de_nacimiento_requerida">Fecha de nacimiento requerida</string>
+    <string name="descripci_n_requerida">Descripción requerida</string>
+    <string name="artistas_favoritos">Artistas Favoritos</string>
+    <string name="todos_los_artistas">Todos los Artistas</string>
+    <string name="id_de_lbum_no_v_lido">ID de álbum no válido</string>
+    <string name="guest">Guest: %1$s</string>
+    <string name="nuevo_comentario">Nuevo comentario</string>
+    <string name="comentario_obligatorio">Comentario obligatorio</string>
+    <string name="comentario_agregado_correctamente">Comentario agregado correctamente</string>
+    <string name="error_al_agregar_comentario">Error al agregar comentario</string>
+    <string name="error_de_red_al_agregar_comentario">Error de red al agregar comentario</string>
+    <string name="_1234567890">1234567890</string>
+    <string name="error_creando_guest">Error creando guest</string>
+    <string name="error_de_red_creando_guest">Error de red creando guest</string>
 
 </resources>
