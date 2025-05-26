@@ -9,6 +9,10 @@
         android:icon="@drawable/ic_artists"
         android:title="@string/title_artists" />
     <item
+        android:id="@+id/collectorsFragment"
+        android:icon="@drawable/ic_favorite"
+        android:title="@string/title_collectors" />
+    <item
         android:id="@+id/profileFragment"
         android:icon="@drawable/ic_profile"
         android:title="@string/title_profile" />

@@ -55,6 +55,11 @@
         tools:layout="@layout/fragment_create_artist" />
 
     <fragment
+        android:id="@+id/collectorsFragment"
+        android:name="com.example.vinilosmobileapp.ui.collectors.CollectorsFragment"
+        android:label="Favoritos" />
+
+    <fragment
         android:id="@+id/profileFragment"
         android:name="com.example.vinilosmobileapp.ui.profile.ProfileFragment"
         android:label="Perfil" />

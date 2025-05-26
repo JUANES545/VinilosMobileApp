@@ -49,8 +49,8 @@
                             android:id="@+id/ivArtist"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:contentDescription="@string/imagen_que_muestra_la_imagen_del_artista_o_grupo_musical"
                             android:scaleType="centerCrop"
+                            tools:ignore="ContentDescription"
                             tools:srcCompat="@tools:sample/avatars" />
                     </com.facebook.shimmer.ShimmerFrameLayout>
 

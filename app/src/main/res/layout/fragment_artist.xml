@@ -40,11 +40,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:contentDescription="@string/bot_n_que_indica_que_se_puede_agregar_un_artista_nuevo_con_el_icono_de"
             android:src="@drawable/ic_add"
             app:backgroundTint="@color/purple_500"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="ContentDescription" />
 
         <!-- FAB extra para filtrar favoritos -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -54,13 +54,13 @@
             android:layout_margin="16dp"
             android:layout_marginEnd="32dp"
             android:layout_marginBottom="60dp"
-            android:contentDescription="@string/bot_n_que_indica_que_se_puede_filtrar_los_artistas_favoritos_con_el_icono_de_una_estrella"
             app:backgroundTint="@android:color/white"
             app:layout_anchor="@id/recyclerViewArtists"
             app:layout_anchorGravity="bottom|end"
             app:layout_constraintBottom_toTopOf="@+id/fab_add_artist"
             app:layout_constraintEnd_toEndOf="@+id/artistContainer"
             app:srcCompat="@drawable/ic_star_filled"
-            app:tint="@color/gold" />
+            app:tint="@color/gold"
+            tools:ignore="ContentDescription" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

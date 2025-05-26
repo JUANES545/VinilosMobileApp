@@ -22,7 +22,6 @@ import com.example.vinilosmobileapp.model.dto.CollectorReferenceDTO
 import com.example.vinilosmobileapp.model.dto.CommentCreateDTO
 import com.example.vinilosmobileapp.ui.album.adapter.CommentInputAdapter
 import com.example.vinilosmobileapp.ui.album.adapter.TrackInputAdapter
-import com.example.vinilosmobileapp.utils.RandomDataProvider
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import retrofit2.Call
 import retrofit2.Callback
@@ -38,6 +37,11 @@ class DetailAlbumFragment : Fragment() {
     private var albumId: Int = -1
     private lateinit var commentAdapter: CommentInputAdapter
     private lateinit var trackAdapter: TrackInputAdapter
+
+    private val guestNames = listOf(
+        "Melómano Anónimo", "Oyente Misterioso", "Amante del Vinilo",
+        "Coleccionista X", "Música para el alma"
+    )
 
     private var collectorsAvailable: List<Collector> = emptyList()
 
@@ -56,11 +60,13 @@ class DetailAlbumFragment : Fragment() {
         (requireActivity() as AppCompatActivity).supportActionBar?.title =
             getString(R.string.album_detail)
 
+        // Initialize the track adapter
         trackAdapter = TrackInputAdapter(emptyList())
         binding.recyclerViewTracks.apply {
             adapter = trackAdapter
             layoutManager = GridLayoutManager(context, 3)
         }
+        // Initialize the comment adapter
         commentAdapter = CommentInputAdapter(emptyList())
         binding.recyclerViewComments.apply {
             adapter = commentAdapter
@@ -72,7 +78,7 @@ class DetailAlbumFragment : Fragment() {
         if (albumId != -1) {
             fetchAlbum()
         } else {
-            showError(getString(R.string.id_de_lbum_no_v_lido))
+            showError("ID de álbum no válido")
         }
 
         binding.buttonRetry.setOnClickListener { fetchAlbum() }
@@ -125,6 +131,7 @@ class DetailAlbumFragment : Fragment() {
             error(R.drawable.ic_failed_to_load_image)
         }
 
+        // Populate tracks
         if (!album.tracks.isNullOrEmpty()) {
             binding.recyclerViewTracks.visibility = View.VISIBLE
             trackAdapter.updateTracks(album.tracks)
@@ -132,6 +139,7 @@ class DetailAlbumFragment : Fragment() {
             binding.recyclerViewTracks.visibility = View.GONE
         }
 
+        // Populate comments
         if (album.comments.isNotEmpty()) {
             binding.recyclerViewComments.visibility = View.VISIBLE
             binding.noCommentsText.visibility = View.GONE
@@ -153,7 +161,7 @@ class DetailAlbumFragment : Fragment() {
         val authorDropdown = dialogView.findViewById<MaterialAutoCompleteTextView>(R.id.inputAuthor)
         val guestHint = dialogView.findViewById<TextView>(R.id.guest_hint)
 
-        val guestName = getString(R.string.guest, RandomDataProvider.guestNames.random())
+        val guestName = "Guest: ${guestNames.random()}"
 
         AlbumServiceAdapter.getCollectors().enqueue(object : Callback<List<Collector>> {
             override fun onResponse(
@@ -189,8 +197,8 @@ class DetailAlbumFragment : Fragment() {
             }
         })
 
-        builder.setTitle(getString(R.string.nuevo_comentario))
-            .setPositiveButton(getString(R.string.agregar)) { _, _ ->
+        builder.setTitle("Nuevo comentario")
+            .setPositiveButton("Agregar") { _, _ ->
                 val commentText = commentInput.text.toString().trim()
                 val selectedAuthorName = authorDropdown.text.toString().trim()
 
@@ -205,13 +213,10 @@ class DetailAlbumFragment : Fragment() {
                         }
                     }
                 } else {
-                    Toast.makeText(
-                        context,
-                        getString(R.string.comentario_obligatorio), Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(context, "Comentario obligatorio", Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton(getString(R.string.cancelar), null)
+            .setNegativeButton("Cancelar", null)
 
         builder.create().show()
     }
@@ -228,16 +233,16 @@ class DetailAlbumFragment : Fragment() {
             .enqueue(object : Callback<Void> {
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     if (response.isSuccessful) {
-                        fetchAlbum()
+                        fetchAlbum() // 👈 Refrescamos comentarios reales desde servidor
                         Toast.makeText(
                             requireContext(),
-                            getString(R.string.comentario_agregado_correctamente),
+                            "Comentario agregado correctamente",
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
                         Toast.makeText(
                             requireContext(),
-                            getString(R.string.error_al_agregar_comentario),
+                            "Error al agregar comentario",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -246,7 +251,7 @@ class DetailAlbumFragment : Fragment() {
                 override fun onFailure(call: Call<Void>, t: Throwable) {
                     Toast.makeText(
                         requireContext(),
-                        getString(R.string.error_de_red_al_agregar_comentario),
+                        "Error de red al agregar comentario",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -256,7 +261,7 @@ class DetailAlbumFragment : Fragment() {
     private fun createGuestCollector(name: String, onCollectorCreated: (Int) -> Unit) {
         AlbumServiceAdapter.createCollector(
             name = name,
-            telephone = getString(R.string._1234567890),
+            telephone = "1234567890",
             email = "${name.replace(" ", "").lowercase()}@guest.com"
         ).enqueue(object : Callback<Collector> {
             override fun onResponse(call: Call<Collector>, response: Response<Collector>) {
@@ -267,19 +272,13 @@ class DetailAlbumFragment : Fragment() {
                         "GUEST_CREATION",
                         "Error: ${response.code()} - ${response.errorBody()?.string()}"
                     )
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.error_creando_guest), Toast.LENGTH_SHORT
-                    )
+                    Toast.makeText(requireContext(), "Error creando guest", Toast.LENGTH_SHORT)
                         .show()
                 }
             }
 
             override fun onFailure(call: Call<Collector>, t: Throwable) {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.error_de_red_creando_guest), Toast.LENGTH_SHORT
-                )
+                Toast.makeText(requireContext(), "Error de red creando guest", Toast.LENGTH_SHORT)
                     .show()
             }
         })

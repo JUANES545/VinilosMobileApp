@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -77,8 +78,8 @@
                     android:id="@+id/image_preview"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
-                    android:contentDescription="@string/imagen_de_referencia_para_indicar_que_se_puede_hacer_click_para_subir_una_imagen_de_artista"
-                    android:src="@drawable/ic_profile" />
+                    android:src="@drawable/ic_profile"
+                    tools:ignore="ContentDescription" />
 
                 <TextView
                     android:layout_width="wrap_content"

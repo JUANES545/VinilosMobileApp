@@ -14,6 +14,7 @@ class MainActivity : AppCompatActivity() {
     private val topLevelDestinations = setOf(
         R.id.homeFragment,
         R.id.artistFragment,
+        R.id.collectorsFragment,
         R.id.profileFragment
     )
 
@@ -40,6 +41,7 @@ class MainActivity : AppCompatActivity() {
             binding.topAppBar.title = when (destination.id) {
                 R.id.homeFragment -> getString(R.string.title_vinilos)
                 R.id.artistFragment -> getString(R.string.title_artists)
+                R.id.collectorsFragment -> getString(R.string.title_collectors)
                 R.id.profileFragment -> getString(R.string.title_profile)
                 else -> getString(R.string.app_name)
             }
