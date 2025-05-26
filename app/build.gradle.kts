@@ -77,7 +77,14 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.mockito.android)
-    androidTestImplementation("org.mockito:mockito-android:5.11.0") // Usa la versión más reciente
+    androidTestImplementation("org.mockito:mockito-android:5.11.0")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1")
+
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+
+    // Para el testing de fragmentos (launchFragmentInContainer)
+    debugImplementation("androidx.fragment:fragment-testing:1.8.7") // Usa la versión más reciente y estable
+// Notice the parentheses () around the string
 
 
     // Fragment testing (solo en debug)
