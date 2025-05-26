@@ -28,7 +28,7 @@ import java.util.*
 class CreateArtistFragment : Fragment() {
 
     private var _binding: FragmentCreateArtistBinding? = null
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
     private val vm: CreateArtistViewModel by viewModels()
     private val cal = Calendar.getInstance()
     private val sdf = SimpleDateFormat("yyyy-MM-dd'T'00:00:00.000'Z'", Locale.getDefault())
